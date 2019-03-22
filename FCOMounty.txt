@@ -1,0 +1,41 @@
+## Title: |c00FF00FCO |cFFFF00Mounty|r
+## Author: Baertram
+## Version: 0.1.3
+## AddOnVersion: 013
+## APIVersion: 100025 100026
+## Description: Advance your mount. Each zone (subzone): Another mount
+## SavedVariables: FCOMounty_Settings
+## DependsOn: LibStub LibAddonMenu-2.0 LibZone
+## FastAPI : 100025
+
+## Libraries
+## Libraries won't be included anymore. They need to be installed as standalone versions. Please read the addon description for further details.
+
+## Translations
+
+## Constant values
+src/FCOM_constants.lua
+
+## Include zone and subzone data
+data/FCOM_zonedata.lua
+
+## Included zone and mount functions
+src/FCOM_zones.lua
+src/FCOM_mounts.lua
+
+## Stable
+src/FCOM_stable.lua
+
+## Included addon settings LAM
+src/FCOM_settings.lua
+src/FCOM_settingsMenu.lua
+
+## Addon source
+FCOMounty.lua
+
+; DISCLOSURE:
+; This Add-on is not created by, affiliated with or sponsored by ZeniMax
+; Media Inc. or its affiliates. The Elder Scrolls? and related logos are
+; registered trademarks or trademarks of ZeniMax Media Inc. in the United
+; States and/or other countries. All rights reserved.
+; You can read the full terms at https://account.elderscrollsonline.com/add-on-terms
