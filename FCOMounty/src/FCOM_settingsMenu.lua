@@ -170,54 +170,84 @@ function FCOMounty.buildAddonMenu()
     end
 
     --Change the entries of the LAM random mounts dropdownbox
+    local randomMountsForZoneAndSubZoneNames = {}
+    local randomMountsForZoneAndSubZone = {}
     local function ChangeRandomMountEntries(zone, subzone)
-d("ChangeRandomMountEntries - zone: " .. tostring(zone) .. ", subZone: " .. tostring(subzone))
---TODO
- --[[
-        if zone == nil or subzone == nil then return false end
-        FCOMounty.LAMDropdownSubZoneNames = {}
-        FCOMounty.LAMDropdownSubZoneValues = {}
+        FCOM.preventerVars.doNotUpdateRandomMountsValue = true
         --Is the subzone dropdownbox there?
-        if FCOMounty_LAM_Dropdown_SubZones_For_Mount ~= nil then
+        if FCOMounty_LAM_Dropdown_Randomized_Mounts_For_Zone_And_Subzone ~= nil then
+            randomMountsForZoneAndSubZone = {}
+            randomMountsForZoneAndSubZoneNames = {}
             --Hide the mount selection dropdown box
-            SetMountSelectDropdownBoxState(false)
+            --SetMountSelectDropdownBoxState(false)
             --Is the zone name "-NONE-"?
-            if zone == FCOM_NONE_ENTRIES then
-
-                table.insert(FCOMounty.LAMDropdownSubZoneNames, FCOM_NONE_ENTRIES)
-                table.insert(FCOMounty.LAMDropdownSubZoneValues, FCOM_NONE_ENTRIES)
-
-            else
-                --Loop over subzone array with the given zone name
-                for zoneName, subZoneData in pairs(FCOMounty.DropdownSubZoneNames) do
-                    if zoneName == zone then
-                        table.insert(FCOMounty.LAMDropdownSubZoneNames, FCOM_ALL_ENTRIES)
-                        table.insert(FCOMounty.LAMDropdownSubZoneValues, FCOM_ALL_ENTRIES)
-                        for subZoneValue, subZoneName in pairs(subZoneData) do
-                            table.insert(FCOMounty.LAMDropdownSubZoneNames, subZoneName)
-                            table.insert(FCOMounty.LAMDropdownSubZoneValues, subZoneValue)
+            if zone ~= nil and subzone ~= nil and zone ~= FCOM_NONE_ENTRIES and subzone ~= FCOM_NONE_ENTRIES then
+                local randomMountsOfZone = settings.zone2RandomMounts[zone]
+                if randomMountsOfZone ~= nil then
+                    local randomMountsOfSubZone = randomMountsOfZone[subzone]
+                    if randomMountsOfSubZone ~= nil then
+                        local mountData = FCOMounty.MountData
+                        for mountId, _ in pairs(randomMountsOfSubZone) do
+                            table.insert(randomMountsForZoneAndSubZone, mountId)
+                            if mountData ~= nil then
+                                local mountName = mountData[mountId]
+                                if mountName and mountName ~= "" then
+                                    table.insert(randomMountsForZoneAndSubZoneNames, mountName)
+                                end
+                            end
                         end
                     end
                 end
             end
-            local numEntries = #FCOMounty.LAMDropdownSubZoneNames
-            if numEntries > 0 then
-                --d(">updateChoices of SUBZONES")
-                FCOMounty_LAM_Dropdown_SubZones_For_Mount:UpdateChoices(FCOMounty.LAMDropdownSubZoneNames, FCOMounty.LAMDropdownSubZoneValues)
-                if not FCOM.preventerVars.doNotUpdateSubZoneValue then
-                    local firstEntry = FCOMounty.LAMDropdownSubZoneValues[1]
-                    FCOMounty.LAMSelectedSubZone = firstEntry
-                    --And now select the default entry of the subZones
-                    --d(">updateValue of SUBZONES to: " ..tostring(firstEntry))
-                    FCOMounty_LAM_Dropdown_SubZones_For_Mount:UpdateValue(false, firstEntry)
-                end
+            FCOMounty_LAM_Dropdown_Randomized_Mounts_For_Zone_And_Subzone:UpdateChoices(randomMountsForZoneAndSubZoneNames, randomMountsForZoneAndSubZone)
+        else
+            d(">LAM dropdown not found: FCOMounty_LAM_Dropdown_Randomized_Mounts_For_Zone_And_Subzone")
+        end
+        FCOM.preventerVars.doNotUpdateRandomMountsValue = false
+    end
+
+    --Change the settings and add/remove the currently selected mount from zone & subzones random mounts entries
+    local function changeRandomMountInSettings(doAddEntry)
+--d("[FCOMounty]changeRandomMountInSettings - doAddEntry: "..tostring(doAddEntry))
+        local zone = FCOMounty.LAMSelectedZone
+        local subzone = FCOMounty.LAMSelectedSubZone
+        --Zone and subzone are given and not "NONE"?
+        if not settings.randomizeMountsForZoneAndSubzone
+                or zone == nil or zone == FCOM_NONE_ENTRIES
+                or subzone == nil or subzone == FCOM_NONE_ENTRIES then
+            return false
+        end
+        --Is a mount selected?
+        local mountId
+        local entryChanged = false
+        --Add an entry to settings
+        if doAddEntry == true then
+            mountId = FCOMounty.LoadMountIdFromSettings(zone, subzone)
+            if mountId == nil or mountId == 0 then return end
+            settings.zone2RandomMounts[zone] = settings.zone2RandomMounts[zone] or {}
+            settings.zone2RandomMounts[zone][subzone] = settings.zone2RandomMounts[zone][subzone] or {}
+            if settings.zone2RandomMounts[zone][subzone][mountId] == nil then
+                FCOMounty.settingsVars.settings.zone2RandomMounts[zone][subzone][mountId] = true
+                entryChanged = true
             end
         else
-            d(">LAM dropdown not found: FCOMounty_LAM_Dropdown_SubZones_For_Mount")
+            --Remove entry
+            if FCOMounty_LAM_Dropdown_Randomized_Mounts_For_Zone_And_Subzone == nil then return false end
+            local selectedItemData = FCOMounty_LAM_Dropdown_Randomized_Mounts_For_Zone_And_Subzone.combobox.m_comboBox:GetSelectedItemData()
+            if not selectedItemData then return false end
+            mountId = selectedItemData.value
+            if mountId == nil or mountId == 0 then return end
+            if settings.zone2RandomMounts[zone] and settings.zone2RandomMounts[zone][subzone] and
+                    settings.zone2RandomMounts[zone][subzone][mountId] ~= nil then
+                FCOMounty.settingsVars.settings.zone2RandomMounts[zone][subzone][mountId] = nil
+                entryChanged = true
+            end
         end
-        FCOM.preventerVars.doNotUpdateSubZoneValue = false
-]]
-end
+        --Update the LAM dropdown box of random mounts now
+        if entryChanged == true then
+            ChangeRandomMountEntries(zone, subzone)
+        end
+    end
 
     --Get the current zone and subzone and update the LAM drodpwons to these values
     local function GetCurrentZoneAndUpdateLAMDropdowns()
@@ -292,7 +322,8 @@ end
             ChangeSubZoneEntries(FCOM_NONE_ENTRIES)
             --Get the game settings for "show mount enhancements stamina, speed and inventory space"
             gameSettingsShowMountEnhancement = FCOMounty.GetGameSettingsMountVisibleEnhancements()
-            CALLBACK_MANAGER:UnregisterCallback("LAM-PanelControlsCreated")
+            --Preset the table as "empty". Will be updated on subZone change!
+            ChangeRandomMountEntries(nil, nil)
         end
     end
     CALLBACK_MANAGER:RegisterCallback("LAM-PanelControlsCreated", FCOMLAMPanelCreated)
@@ -363,24 +394,23 @@ end
         --==============================================================================
         {
             type = 'header',
-            name = 'Mounts',
+            name = 'Mount settings',
         },
-
         {
             type = "checkbox",
             name = 'Change mount: Preset for zone',
-            tooltip = 'If you change the mount manually by help of the collectibles e.g.: Preset this mount as the current zone\'s & subzone\'s mount.',
+            tooltip = 'If you change the mount manually by help of the collectibles e.g.: Preset this mount as the current zone\'s & subzone\'s mount.\nDoes not work if randomized mounts are enabled!',
             getFunc = function() return settings.autoPresetForZoneOnNewMount end,
             setFunc = function(value) settings.autoPresetForZoneOnNewMount = value
             end,
+            disabled = function() return settings.randomizeMountsForZoneAndSubzone end,
             default = defaults.autoPresetForZoneOnNewMount,
             width="full",
         },
-
         {
             type = "checkbox",
             name = FCOM_ALL_ENTRIES .. ": Use this mount for all subzones",
-            tooltip = "If you set a mount for the subzone " .. FCOM_ALL_ENTRIES .. " and enable this setting, the selected mount will be used for all subzones, even if you have specified another mount for the different subzones.",
+            tooltip = "If you set a mount for the subzone " .. FCOM_ALL_ENTRIES .. " and enable this setting, the selected mount will be used for all subzones, even if you have specified another mount for the different subzones.\nAttention: If you have enabled the randomized mounts the subZone entry \'" .. FCOM_ALL_ENTRIES .. "\' will be used to detect the random mount for the zone!",
             getFunc = function() return settings.useSubzoneALLMountInAllSubzones end,
             setFunc = function(value)
                 settings.useSubzoneALLMountInAllSubzones = value
@@ -395,11 +425,21 @@ end
                     checkIfNotIsMountedAndUpdateMountSettingsForCurrentZoneAndSubzone(zoneToUse, subZoneToUse, onlyUpdateMountEnh, doUpdateMountEnhancements)
                 end
             end,
+            disabled = function() return false end, --return settings.randomizeMountsForZoneAndSubzone end,
             default = defaults.useSubzoneALLMountInAllSubzones,
             width="full",
         },
 
         --ZONEs
+        {
+            type = 'header',
+            name = 'Mounts - Zone & subzone',
+        },
+        {
+            type = "description",
+            text = "First choose a zone, then a subzone (except " .. FCOM_NONE_ENTRIES .. ")\nA new dropdownbox containing your available mounts will get visible. Select the mount you want to use for the selected combination of zone & subZone.\nMounts will ONLY change a few seconds after you unmount or if you switch a zone.",
+            title = "Mounts Zone & subzone - How does it work?",
+        },
         {
             type = "dropdown",
             name = "Zone", -- or string id or function returning a string
@@ -461,10 +501,14 @@ end
                     FCOMounty.LAMSelectedSubZone = subZoneName
                     --Enable the mount dropdown box now
                     SetMountSelectDropdownBoxState(true)
+                    --Update the dropdown for the random mounts of each zone & subZone
+                    ChangeRandomMountEntries(FCOMounty.LAMSelectedZone, FCOMounty.LAMSelectedSubZone)
                 else
                     FCOMounty.LAMSelectedSubZone = nil
                     --Disable the mount dropdown box now
                     SetMountSelectDropdownBoxState(false)
+                    --Update the dropdown for the random mounts of the zone & subZone -> Clear it!
+                    ChangeRandomMountEntries(nil, nil)
                 end
 --d("SUBZONE DROPDOWN: SetFunc - subZoneName: " .. tostring(subZoneName) .. ", LAMselectedSubZone: " .. tostring(FCOMounty.LAMSelectedSubZone))
             end,
@@ -521,56 +565,9 @@ end
 
         --Randomized MOUNTs for a zone & subzone
         {
-            type = "description",
-            text = "Choose a zone & subzone above and then add the mount from the dropdown \"Mount for zone & subzone\" above to the dropdown below by using the \"+\" button,\nor remove mounts from the dropdown \"Randomized mounts for zone & subzone\" below by selecting an entry and using the \"-\" button.",
-            title = "Randomized mounts",
-        },
-        {
-            type = "button",
-            name = "+", -- string id or function returning a string
-            func = function()
-            end,
-            tooltip = "Add mount to randomized for zone & subzone", -- string id or function returning a string (optional)
-            width = "half", --or "half" (optional)
-            disabled = function() return not settings.randomizeMountsForZoneAndSubzone end, --or boolean (optional)
-            reference = "FCOMounty_LAM_Button_Add_To_Randomized", -- unique global reference to control (optional)
-        },
-        {
-            type = "button",
-            name = "-", -- string id or function returning a string
-            func = function()
-            end,
-            tooltip = "Remove mount from randomized for zone & subzone", -- string id or function returning a string (optional)
-            width = "half", --or "half" (optional)
-            disabled = function() return not settings.randomizeMountsForZoneAndSubzone or FCOMounty.LAMSelectedZone == nil or FCOMounty.LAMSelectedSubZone == nil end, --or boolean (optional)
-            reference = "FCOMounty_LAM_Button_Remove_From_Randomized", -- unique global reference to control (optional)
-        },
-        {
-            type = "dropdown",
-            name = "Randomized mounts for zone & subzone", -- or string id or function returning a string
-            tooltip = "Add mounts for the zone & subzone which can be chosen from by the randomizer", -- or string id or function returning a string (optional)
-            choices = FCOMounty.DropdownMountNames,
-            choicesValues = FCOMounty.DropdownMountValues, -- if specified, these values will get passed to setFunc instead (optional)
-            getFunc = function()
-                --Get the chosen random mounts for the zone and subzone from the settings
-                local chosenMountId = FCOMounty.LoadRandomMountIdFromSettings(FCOMounty.LAMSelectedZone, FCOMounty.LAMSelectedSubZone)
-                if chosenMountId ~= nil then
-                    return chosenMountId
-                end
-            end,
-            setFunc = function(mountId)
-            end,
-            --choicesTooltips = {"tooltip 1", "tooltip 2", "tooltip 3"}, -- or array of string ids or array of functions returning a string (optional)
-            sort = "name-up", --or "name-down", "numeric-up", "numeric-down", "value-up", "value-down", "numericvalue-up", "numericvalue-down" (optional) - if not provided, list will not be sorted
-            width = "full", --or "half" (optional)
-            scrollable = true, -- boolean or number, if set the dropdown will feature a scroll bar if there are a large amount of choices and limit the visible lines to the specified number or 10 if true is used (optional)
-            disabled = function() return not settings.randomizeMountsForZoneAndSubzone or FCOMounty.LAMSelectedZone == nil or FCOMounty.LAMSelectedSubZone == nil end, --or boolean (optional)
-            reference = "FCOMounty_LAM_Dropdown_Randomized_Mounts_For_Zone_And_Subzone" -- unique global reference to control (optional)
-        },
-        {
             type = "checkbox",
             name = 'Randomize mounts zone & subzone',
-            tooltip = '',
+            tooltip = 'Add mounts to the selected zone & subzone combination and randomize the usage of these selected mounts each time you change a zone, or unmount.\nIf the \'Use this mount for all subzones\' checkbox is enabled the mounts mzst be added at zone (any) + subzone = \'' .. FCOM_ALL_ENTRIES .. '\'',
             getFunc = function()
                 return settings.randomizeMountsForZoneAndSubzone
             end,
@@ -580,11 +577,92 @@ end
             default = defaults.randomizeMountsForZoneAndSubzone,
             width="half",
         },
+        {
+            type = "description",
+            text = "Add & remove: First choose a zone & subzone above (except " .. FCOM_NONE_ENTRIES .. ")\n-Add: Select a mount from the dropdown \"Mount for zone & subzone\" and click on the \"+\" button.\n-Remove: Select a mount in the dropdown \"Randomized mounts for zone & subzone\" and click on the \"-\" button.",
+            title = "Randomized mounts - How does it work?",
+        },
+        {
+            type = "button",
+            name = "+", -- string id or function returning a string
+            func = function()
+                --Add the chosen mount to the random mounts of the current zone & subzone selection
+                changeRandomMountInSettings(true)
+            end,
+            tooltip = "Add mount to randomized for zone & subzone", -- string id or function returning a string (optional)
+            width = "half", --or "half" (optional)
+            disabled = function()
+                if not settings.randomizeMountsForZoneAndSubzone then return true end
+                if FCOMounty_LAM_Dropdown_Mounts_For_Mount and FCOMounty_LAM_Dropdown_Mounts_For_Mount.combobox then
+                    local cbox = FCOMounty_LAM_Dropdown_Mounts_For_Mount.combobox
+                    if cbox.m_comboBox and cbox.m_comboBox.m_selectedItemText then
+                        local cboxText = cbox.m_comboBox.m_selectedItemText
+                        if cboxText.GetText then
+                            if cboxText:GetText() == FCOM_NONE_ENTRIES then
+                                return true
+                            end
+                        end
+                    end
+                end
+            end, --or boolean (optional)
+            reference = "FCOMounty_LAM_Button_Add_To_Randomized", -- unique global reference to control (optional)
+        },
+        {
+            type = "button",
+            name = "-", -- string id or function returning a string
+            func = function()
+                --Remove the chosen mount from the random mounts of the current zone & subzone selection
+                changeRandomMountInSettings(false)
+            end,
+            tooltip = "Remove mount from randomized for zone & subzone", -- string id or function returning a string (optional)
+            width = "half", --or "half" (optional)
+            disabled = function()
+                if not settings.randomizeMountsForZoneAndSubzone
+                        or FCOMounty.LAMSelectedZone == nil or FCOMounty.LAMSelectedZone == FCOM_NONE_ENTRIES
+                        or FCOMounty.LAMSelectedSubZone == nil or FCOMounty.LAMSelectedSubZone == FCOM_NONE_ENTRIES
+                then return true end
+                if FCOMounty_LAM_Dropdown_Randomized_Mounts_For_Zone_And_Subzone then
+                    local choices = FCOMounty_LAM_Dropdown_Randomized_Mounts_For_Zone_And_Subzone.choices
+                    if choices then
+                        local selectedItemData = FCOMounty_LAM_Dropdown_Randomized_Mounts_For_Zone_And_Subzone.combobox.m_comboBox.m_selectedItemData
+                        if selectedItemData ~= nil then return false end
+                    end
+                    return true
+                end
+            end, --or boolean (optional)
+            reference = "FCOMounty_LAM_Button_Remove_From_Randomized", -- unique global reference to control (optional)
+        },
+        {
+            type = "dropdown",
+            name = "Randomized mounts for zone & subzone", -- or string id or function returning a string
+            tooltip = "Add mounts for the zone & subzone which can be chosen from by the randomizer", -- or string id or function returning a string (optional)
+            choices = randomMountsForZoneAndSubZoneNames,
+            choicesValues = randomMountsForZoneAndSubZone,
+            getFunc = function()
+            end,
+            setFunc = function(mountId)
+            end,
+            --choicesTooltips = {"tooltip 1", "tooltip 2", "tooltip 3"}, -- or array of string ids or array of functions returning a string (optional)
+            sort = "name-up", --or "name-down", "numeric-up", "numeric-down", "value-up", "value-down", "numericvalue-up", "numericvalue-down" (optional) - if not provided, list will not be sorted
+            width = "full", --or "half" (optional)
+            scrollable = true, -- boolean or number, if set the dropdown will feature a scroll bar if there are a large amount of choices and limit the visible lines to the specified number or 10 if true is used (optional)
+            disabled = function()
+                return not settings.randomizeMountsForZoneAndSubzone
+                        or FCOMounty.LAMSelectedZone == nil or FCOMounty.LAMSelectedZone == FCOM_NONE_ENTRIES
+                        or FCOMounty.LAMSelectedSubZone == nil or FCOMounty.LAMSelectedSubZone == FCOM_NONE_ENTRIES
+            end, --or boolean (optional)
+            reference = "FCOMounty_LAM_Dropdown_Randomized_Mounts_For_Zone_And_Subzone" -- unique global reference to control (optional)
+        },
 
         --Mount visible enhancements
         {
             type = "header",
             name = "Mount visible enhancements",
+        },
+        {
+            type = "description",
+            text = "First choose a zone & subzone above (except " .. FCOM_NONE_ENTRIES .. ")\nThen select which enhancement should be hidden at the selected zone & subZone.",
+            title = "Mount visible enhancements - How does it work?",
         },
         --Mount visible enhancements speed
         {

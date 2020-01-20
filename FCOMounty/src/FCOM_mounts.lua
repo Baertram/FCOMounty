@@ -55,7 +55,6 @@ function FCOMounty.BuildMountData()
 end
 
 --Get the mount from the settings by help of the zone name, and subzone name
---Get the mount from the settings by help of the zone name, and subzone name
 function FCOMounty.GetMountByZone(zone, subZone)
 --d("[FCOMounty.GetMountByZone]1) zone: " .. tostring(zone) .. ", subZone: " .. tostring(subZone))
     local mountToUse = 0
@@ -205,6 +204,40 @@ function FCOMounty.getMountEnhancementsForZone(zone, subZone)
     return mountEnhancementData
 end
 
+--Check if randomized mounts are enabled for the zone and subzone
+function FCOMounty.checkAndGetRandomizedMountForZoneAndSubzone(zone, subZone)
+    if zone == nil or subZone == nil or zone == FCOM_NONE_ENTRIES or subZone == FCOM_NONE_ENTRIES then return end
+    local settings = FCOMounty.settingsVars.settings
+    if not settings or not settings.randomizeMountsForZoneAndSubzone then return end
+    local randomizedMountId
+    --Read settings
+    if settings.zone2RandomMounts[zone] ~= nil and settings.zone2RandomMounts[zone][subZone] ~= nil then
+        --Get list of randomized mounts for zone and subzone from settings
+        local allMountIdsForZoneAndSubZone = settings.zone2RandomMounts[zone][subZone]
+        --Transfer all entries to a number indexed table
+        local numberIndexedRandomMountsForZoneAndSubZone = {}
+        for mountId, _ in pairs(allMountIdsForZoneAndSubZone) do
+            table.insert(numberIndexedRandomMountsForZoneAndSubZone, mountId)
+        end
+        if numberIndexedRandomMountsForZoneAndSubZone ~= nil then
+            local numEntries = #numberIndexedRandomMountsForZoneAndSubZone
+            if numEntries > 0 then
+                local newRndMountIdFound = false
+                while newRndMountIdFound == false do
+                    --Randomize one entry of the table
+                    local randomizer = math.random(numEntries)
+                    randomizedMountId = numberIndexedRandomMountsForZoneAndSubZone[randomizer] or numberIndexedRandomMountsForZoneAndSubZone[1]
+                    if randomizedMountId ~= FCOMounty.lastRandomMountId then
+                        newRndMountIdFound = true
+                    end
+                end
+            end
+        end
+    end
+    --Return the randomized mountId
+    return randomizedMountId
+end
+
 --Check the zone & subzone mount settings and set the collectible as active now, if already set for the zone & subzone
 function FCOMounty.ActivateMountForZone(zone, subZone, override, onlyUpdateMountVisibleEnhancements, updateMountEnh)
     onlyUpdateMountVisibleEnhancements = onlyUpdateMountVisibleEnhancements or false
@@ -222,6 +255,8 @@ function FCOMounty.ActivateMountForZone(zone, subZone, override, onlyUpdateMount
     if zone == nil then
         zone, subZone = FCOMounty.GetZoneAndSubzone()
     end
+    local mountId
+    local mountEnhancementData
     local settings = FCOMounty.settingsVars.settings
     --Subzone is found but the setting to use the ALL subZone mount is activated: Use zone only
     --Use the -ALL- entry mount for all the subZone mounts? Or is no subZone selected? Then clear it. Else keep it.
@@ -233,25 +268,32 @@ function FCOMounty.ActivateMountForZone(zone, subZone, override, onlyUpdateMount
         local chosenMountId = FCOMounty.LoadMountIdFromSettings(zone, subZone)
         if chosenMountId == nil or chosenMountId == 0 then subZone = nil end
     end
---d("ActivateMountForZone - zone: " .. tostring(zone) .. ", subZone: " .. tostring(subZone) .. ", override: " ..tostring(override))
+    --d("ActivateMountForZone - zone: " .. tostring(zone) .. ", subZone: " .. tostring(subZone) .. ", override: " ..tostring(override))
     if override or (FCOMounty.preventerVars.lastZone ~= zone or (FCOMounty.preventerVars.lastZone == zone and FCOMounty.preventerVars.lastSubZone ~= subZone)) then
         FCOMounty.preventerVars.lastZone = zone
         FCOMounty.preventerVars.lastSubZone = subZone
     else
---d("<<ABORTED: Same zone / subzone")
+        --d("<<ABORTED: Same zone / subzone")
         return false
     end
-    --Get the mount from the settings by help of the zone name, and subzone name
-    local mountId = FCOMounty.GetMountByZone(zone, subZone)
+    --Use randomized mounts for zone & subZone?
+    local randomMountId = FCOMounty.checkAndGetRandomizedMountForZoneAndSubzone(zone, subZone)
+--d("[FCOMounty]ActivateMountForZone - randomMountId: " ..tostring(randomMountId))
+    if randomMountId == nil or randomMountId <= 0 then
+        --Get the mount from the settings by help of the zone name, and subzone name
+        mountId = FCOMounty.GetMountByZone(zone, subZone)
+    else
+        mountId = randomMountId
+        FCOMounty.lastRandomMountId = randomMountId
+    end
     --Get the mounts shown enhancements, if mount was chosen
-    local mountEnhancementData
     if mountId ~= 0 then
         if updateMountEnh == true then
             mountEnhancementData = {}
             mountEnhancementData = FCOMounty.getMountEnhancementsForZone(zone, subZone)
         end
     end
---d(">mountId: " .. tostring(mountId) .. ", mountName:  " .. ZO_CachedStrFormat("<<C:1>>", GetCollectibleInfo(mountId)) .. ", mountEnhancementUpdate: " ..tostring(onlyUpdateMountVisibleEnhancements))
+    --d(">mountId: " .. tostring(mountId) .. ", mountName:  " .. ZO_CachedStrFormat("<<C:1>>", GetCollectibleInfo(mountId)) .. ", mountEnhancementUpdate: " ..tostring(onlyUpdateMountVisibleEnhancements))
     --Was a mount chosen? Then activate it now
     if mountId ~= nil and mountId ~= 0 then
         return FCOMounty.ChooseMountNow(mountId, mountEnhancementData, onlyUpdateMountVisibleEnhancements)

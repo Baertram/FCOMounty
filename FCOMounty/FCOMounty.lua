@@ -30,7 +30,7 @@ FCOMounty.isInDungeon = false
 FCOMounty.isInDelve = false
 
 FCOMounty.addonVars = {}
-FCOMounty.addonVars.addonVersion		        = "0.1.3"
+FCOMounty.addonVars.addonVersion		        = "0.1.5"
 FCOMounty.addonVars.addonSavedVarsVersion	    = "0.01"
 FCOMounty.addonVars.addonName				    = "FCOMounty"
 FCOMounty.addonVars.addonNameMenu  		        = "FCO Mounty"
@@ -47,6 +47,7 @@ FCOMounty.settingsVars.defaults = {}
 
 FCOMounty.preventerVars = {}
 FCOMounty.preventerVars.doNotUpdateSubZoneValue = false
+FCOMounty.preventerVars.doNotUpdateRandomMountsValue = false
 FCOMounty.preventerVars.lastZone = FCOM_NONE_ENTRIES
 FCOMounty.preventerVars.lastSubZone = FCOM_NONE_ENTRIES
 FCOMounty.preventerVars.doNotChangePresetMount = false
@@ -69,6 +70,9 @@ FCOMounty.gameSettings.settingsIDs = {}
 FCOMounty.gameSettings.settingsIDs[RIDING_TRAIN_SPEED] = IN_WORLD_UI_SETTING_HIDE_MOUNT_SPEED_UPGRADE
 FCOMounty.gameSettings.settingsIDs[RIDING_TRAIN_STAMINA] = IN_WORLD_UI_SETTING_HIDE_MOUNT_STAMINA_UPGRADE
 FCOMounty.gameSettings.settingsIDs[RIDING_TRAIN_CARRYING_CAPACITY] = IN_WORLD_UI_SETTING_HIDE_MOUNT_INVENTORY_UPGRADE
+--Random mounts
+FCOMounty.lastRandomMountId = 0
+
 
 --Request the update to the mount change
 local function RequestMountUpdate(forceMountActivation)
