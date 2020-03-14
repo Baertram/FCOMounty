@@ -533,8 +533,9 @@ FCOMounty.ZoneData["elsweyr"] = {-- Elsweyr
     ["weepingscarpit_base"] = 1112,
 }
 
-FCOMounty.ZoneData["southern_elsweyr"] = {-- Southern Elsweyr
+FCOMounty.ZoneData["southernelsweyr"] = {-- Southern Elsweyr
     [FCOM_ZONE_ID_STRING] = 1133,
     --Southern Elsweyr
     ["southernelsweyr_base"]       = 1133, -- Southern Elsweyr
+	["senchal_base"] = "Senchal",
 }
