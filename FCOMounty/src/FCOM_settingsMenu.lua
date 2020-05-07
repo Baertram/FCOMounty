@@ -18,7 +18,9 @@ function FCOMounty.buildAddonMenu()
         registerForRefresh 	= true,
         registerForDefaults = true,
         slashCommand        = "/fcoms",
-        website             = addonVars.addonWebsite
+        website             = addonVars.addonWebsite,
+        feedback            = addonVars.addonFeedback,
+        donation            = addonVars.addonDonation,
     }
 
     local savedVariablesOptions = {

@@ -30,7 +30,7 @@ FCOMounty.isInDungeon = false
 FCOMounty.isInDelve = false
 
 FCOMounty.addonVars = {}
-FCOMounty.addonVars.addonVersion		        = "0.1.5"
+FCOMounty.addonVars.addonVersion		        = "0.1.7"
 FCOMounty.addonVars.addonSavedVarsVersion	    = "0.01"
 FCOMounty.addonVars.addonName				    = "FCOMounty"
 FCOMounty.addonVars.addonNameMenu  		        = "FCO Mounty"
@@ -39,6 +39,10 @@ FCOMounty.addonVars.addonSavedVariablesName     = "FCOMounty_Settings"
 FCOMounty.addonVars.settingsName   		        = "FCO Mounty"
 FCOMounty.addonVars.addonAuthor			        = "Baertram"
 FCOMounty.addonVars.addonWebsite                = "http://www.esoui.com/downloads/info1866-FCOMounty.html"
+FCOMounty.addonVars.addonFeedback               = "https://www.esoui.com/downloads/info1866-FCOMounty.html#comments"
+FCOMounty.addonVars.addonDonation               = "https://www.esoui.com/portal.php?id=136&a=faq&faqid=131"
+FCOMounty.addonVars.bugReportURL                = "https://www.esoui.com/portal.php?id=136&a=bugreport&addonid=%s&title=%s&message=%s"
+FCOMounty.addonVars.bugReportAddonId            = 1866 -- FCOMounty
 
 FCOMounty.settingsVars = {}
 FCOMounty.settingsVars.defaultSettings = {}
@@ -233,8 +237,8 @@ function FCOMounty.Player_Activated(...)
         EVENT_MANAGER:RegisterForEvent(FCOMounty.addonVars.addonName, EVENT_RIDING_SKILL_IMPROVEMENT, FCOMounty.EventRidingSkillImprovement)
 
         EVENT_MANAGER:RegisterForEvent(FCOMounty.addonVars.addonName, EVENT_PLAYER_COMBAT_STATE, FCOMounty.EvenetPlayerCombatState)
-    else
-        d("[FCOMounty] Disabled addon inside delves & dungeons (for an improved performance)!")
+    --else
+        --d("[FCOMounty] Disabled addon inside delves & dungeons (for an improved performance)!")
     end
 end
 
@@ -252,9 +256,13 @@ function FCOMounty.addonLoaded(eventName, addon)
     FCOMounty.getSettings()
 
     --Create the settings panel object of libAddonMenu 2.0
-    FCOMounty.LAM = LibAddonMenu2 or LibStub('LibAddonMenu-2.0')
+    FCOMounty.LAM = LibAddonMenu2
     --Create the zone data object of libZone
     FCOMounty.libZone = LibZone
+
+    --Slash commands
+    SLASH_COMMANDS["/fcomz"] = function() FCOMounty.zone2Chat() end
+    SLASH_COMMANDS["/fcomr"] = function() FCOMounty.reportMissingZoneData() end
 
     --Build the LAM
     FCOMounty.buildAddonMenu()

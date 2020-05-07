@@ -539,3 +539,12 @@ FCOMounty.ZoneData["southernelsweyr"] = {-- Southern Elsweyr
     ["southernelsweyr_base"]       = 1133, -- Southern Elsweyr
 	["senchal_base"] = "Senchal",
 }
+
+FCOMounty.ZoneData["skyrim"] = {-- Skyrim
+    [FCOM_ZONE_ID_STRING] = 1160,
+    --Western Skyrim
+    ["westernskryim_base"]  = 1160,
+    ["solitudecity_base"]   = "Solitude City",
+    --Blackreach
+    ["blackreach_base"]     = 1161, -- Blackreach (underground of Western Skyrim)
+}
