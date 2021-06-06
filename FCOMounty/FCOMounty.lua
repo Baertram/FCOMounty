@@ -30,7 +30,7 @@ FCOMounty.isInDungeon = false
 FCOMounty.isInDelve = false
 
 FCOMounty.addonVars = {}
-FCOMounty.addonVars.addonVersion		        = "0.1.7"
+FCOMounty.addonVars.addonVersion		        = "0.2.2"
 FCOMounty.addonVars.addonSavedVarsVersion	    = "0.01"
 FCOMounty.addonVars.addonName				    = "FCOMounty"
 FCOMounty.addonVars.addonNameMenu  		        = "FCO Mounty"
@@ -118,7 +118,7 @@ function FCOMounty.EventCollectibleUseResult(eventCode, CollectibleUsageBlockRea
 end
 
 --EVENT_PLAYER_COMBAT_STATE (number eventCode, boolean inCombat)
-function FCOMounty.EvenetPlayerCombatState(eventCode, inCombat)
+function FCOMounty.EventPlayerCombatState(eventCode, inCombat)
     if not inCombat and FCOMounty.preventerVars.updateMountInCombat then
         local isInDungeon, isInDelve = FCOMounty.isPlayerInDungeon()
         if isInDungeon or isInDelve then return false end
@@ -236,7 +236,7 @@ function FCOMounty.Player_Activated(...)
 
         EVENT_MANAGER:RegisterForEvent(FCOMounty.addonVars.addonName, EVENT_RIDING_SKILL_IMPROVEMENT, FCOMounty.EventRidingSkillImprovement)
 
-        EVENT_MANAGER:RegisterForEvent(FCOMounty.addonVars.addonName, EVENT_PLAYER_COMBAT_STATE, FCOMounty.EvenetPlayerCombatState)
+        EVENT_MANAGER:RegisterForEvent(FCOMounty.addonVars.addonName, EVENT_PLAYER_COMBAT_STATE, FCOMounty.EventPlayerCombatState)
     --else
         --d("[FCOMounty] Disabled addon inside delves & dungeons (for an improved performance)!")
     end

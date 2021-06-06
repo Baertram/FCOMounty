@@ -7,49 +7,70 @@ local FCOMounty = FCOM
 function FCOMounty.BuildMountData()
     FCOMounty.MountData = {}
     local MountData = {}
-
-    for categoryIndex=1, GetNumCollectibleCategories() do
-
-        local name, numSubCatgories, numCollectibles, unlockedCollectibles = GetCollectibleCategoryInfo(categoryIndex)
-
-        for subCategoryIndex=1, numSubCatgories do
-
-            local subCategoryName, subCategoryNumCollectibles, subCategoryUnlockedCollectibles = GetCollectibleSubCategoryInfo(categoryIndex, subCategoryIndex)
-
-            for collectibleIndex=1, subCategoryNumCollectibles do
-
-                local collectibleId = GetCollectibleId(categoryIndex, subCategoryIndex, collectibleIndex)
-                local collectibleName, _, _, _, unlocked, _, _, categoryType = GetCollectibleInfo(collectibleId)
-                --Only mounts
-                if categoryType == COLLECTIBLE_CATEGORY_TYPE_MOUNT then
-                    local mountsAreEnabled = subCategoryUnlockedCollectibles > 0
-                    if mountsAreEnabled then
-                        if unlocked and not IsCollectibleBlocked(collectibleId) then
-                            if not MountData[collectibleId] then
-                                local mountName = zo_strformat(SI_COLLECTIBLE_NAME_FORMATTER, collectibleName)
-                                MountData[collectibleId] = mountName
+d("[FCOMounty]BuildMountData")
+    --[[
+        for categoryIndex=1, GetNumCollectibleCategories() do
+            local name, numSubCatgories, numCollectibles, unlockedCollectibles = GetCollectibleCategoryInfo(categoryIndex)
+    --d(">numCollectibles: " ..tostring(numCollectibles))
+            for subCategoryIndex=1, numSubCatgories do
+                --** _Returns:_ *string* _name_, *integer* _numCollectibles_, *integer* _unlockedCollectibles_, *integer* _totalCollectibles_
+                local subCategoryName, subCategoryNumCollectibles, subCategoryUnlockedCollectibles = GetCollectibleSubCategoryInfo(categoryIndex, subCategoryIndex)
+                for collectibleIndex=1, subCategoryNumCollectibles do
+    --d(">>collectibleIndex: " ..tostring(collectibleIndex))
+                    local collectibleId = GetCollectibleId(categoryIndex, subCategoryIndex, collectibleIndex)
+                    --** _Returns:_ *string* _name_, *string* _description_, *textureName* _icon_, *textureName* _deprecatedLockedIcon_, *bool* _unlocked_, *bool* _purchasable_, *bool* _isActive_, *[CollectibleCategoryType|#CollectibleCategoryType]* _categoryType_, *string* _hint_
+                    local collectibleName, desc, iconTexture, deprLockedIconTexture, unlocked, purchasable, isActive, categoryType, hint = GetCollectibleInfo(collectibleId)
+                    --Only mounts
+                    if categoryType == COLLECTIBLE_CATEGORY_TYPE_MOUNT then
+                        --As of APIVersion 100032 ZOs changed somehow the function GetCollectibleSubCategoryInfo and thus the 3rd return parameter number _unlockedCollectibles_ always returns 0...
+                        --Sow e cannot use the mountsAreEnabled check anymore!
+                        --local mountsAreEnabled = subCategoryUnlockedCollectibles > 0
+    --d(">>>subCatType is mount - unlocked: " ..tostring(unlocked) .. "; mountsAreEnabled: " ..tostring(mountsAreEnabled) .. "; blocked: " ..tostring(IsCollectibleBlocked(collectibleId)))
+                        if unlocked then --and mountsAreEnabled then
+                            if not IsCollectibleBlocked(collectibleId) then
+    --d(">>>>>not blocked")
+                                if not MountData[collectibleId] then
+                                    local mountName = zo_strformat(SI_COLLECTIBLE_NAME_FORMATTER, collectibleName)
+    --d(string.format(">>catIdx: %s, catName: %s, subCatIdx: %s, subCatName: %s, colIdx: %s, colId: %s, colName: %s", tostring(categoryIndex), tostring(name), tostring(subCategoryIndex), tostring(subCategoryName), tostring(collectibleIndex), tostring(collectibleId), tostring(mountName)))
+                                    MountData[collectibleId] = mountName
+                                end
                             end
                         end
                     end
                 end
             end
-        end
-
-        for collectibleIndex=1, numCollectibles do
-
-            local collectibleId = GetCollectibleId(categoryIndex, nil, collectibleIndex)
-            local collectibleName, _, _, _, unlocked, _, _, categoryType = GetCollectibleInfo(collectibleId)
-            if categoryType == COLLECTIBLE_CATEGORY_TYPE_MOUNT then
-                if unlocked and not IsCollectibleBlocked(collectibleId) then
-                    if not MountData[collectibleId] then
-                        local mountName = zo_strformat(SI_COLLECTIBLE_NAME_FORMATTER, collectibleName)
-                        MountData[collectibleId] = mountName
+    --d(">checking numCollectibles now...")
+            for collectibleIndex=1, numCollectibles do
+                local collectibleId = GetCollectibleId(categoryIndex, nil, collectibleIndex)
+                local collectibleName, _, _, _, unlocked, _, _, categoryType = GetCollectibleInfo(collectibleId)
+                if categoryType == COLLECTIBLE_CATEGORY_TYPE_MOUNT then
+                    if unlocked and not IsCollectibleBlocked(collectibleId) then
+                        if not MountData[collectibleId] then
+                            local mountName = zo_strformat(SI_COLLECTIBLE_NAME_FORMATTER, collectibleName)
+    --d(string.format(">>>catIdx: %s, catName: %s, colIdx: %s, colId: %s, colName: %s", tostring(categoryIndex), tostring(name), tostring(collectibleIndex), tostring(collectibleId), tostring(mountName)))
+                            MountData[collectibleId] = mountName
+                        end
                     end
                 end
             end
 
         end
-
+    ]]
+    --New and clean:
+    local function IsNotMountCategory(categoryData)
+        return not categoryData:IsOutfitStylesCategory() and not categoryData:IsHousingCategory()
+    end
+    local function IsMount(collectibleData)
+        return collectibleData:IsCategoryType(COLLECTIBLE_CATEGORY_TYPE_MOUNT)
+    end
+    for idx, categoryData in ZO_COLLECTIBLE_DATA_MANAGER:CategoryIterator({IsNotMountCategory}) do
+        for _, subCategoryData in categoryData:SubcategoryIterator({IsNotMountCategory}) do
+            for _, subCatCollectibleData in subCategoryData:CollectibleIterator({IsMount}) do
+                if subCatCollectibleData:IsUnlocked() and not subCatCollectibleData:IsBlocked() then
+                    MountData[subCatCollectibleData:GetId()] = subCatCollectibleData:GetFormattedName()
+                end
+            end
+        end
     end
     FCOMounty.MountData = MountData
 end

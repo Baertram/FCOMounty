@@ -548,3 +548,20 @@ FCOMounty.ZoneData["skyrim"] = {-- Skyrim
     --Blackreach
     ["blackreach_base"]     = 1161, -- Blackreach (underground of Western Skyrim)
 }
+
+FCOMounty.ZoneData["reach"] = {-- Reach
+    [FCOM_ZONE_ID_STRING] = 1207,
+    --The Reach
+    ["reach_base"] = 1207,
+    ["markarthcity_base"] = "Markarth City",
+    --Blackreach
+    ["u28_blackreach_base"] = 1208, -- Blackreach (underground of The Reach)
+}
+
+FCOMounty.ZoneData["blackwood"] = {-- Blackwood
+    [FCOM_ZONE_ID_STRING] = 1261,
+    ["blackwood_base"] = 1261,
+    ["u30_gideoncity_base"] = "Gideon",
+    ["u30_leyawiincity_base"] = "Leyawiin"
+}
+
