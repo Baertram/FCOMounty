@@ -25,9 +25,12 @@ end
 
 --Try to add missing zone data to the table FCOMounty.ZoneData
 function FCOMounty.EnhanceZoneDataByCurrentZone(zoneIndex)
---d("FCOMounty.EnhanceZoneDataByCurrentZone")
+    --d("FCOMounty.EnhanceZoneDataByCurrentZone")
     local isInDungeon, isInDelve = FCOMounty.isPlayerInDungeon()
     if isInDungeon or isInDelve then return false end
+    local houseOwner = GetCurrentHouseOwner()
+    if houseOwner and houseOwner ~= "" then return end
+
     local zoneId, parentZoneId
     zoneIndex = zoneIndex or GetCurrentMapZoneIndex()
     if not zoneIndex then return false end
@@ -38,7 +41,7 @@ function FCOMounty.EnhanceZoneDataByCurrentZone(zoneIndex)
     --We are only able to check the currently active subzone data! Not all data at the map.
     local zoneName, subzoneName, _, _ = FCOMounty.GetZoneAndSubzone()
     if zoneName ~= nil and zoneName ~= "" then
-d("[FCOMounty]Current zoneName(ID): " ..tostring(zoneName) .. "(".. tostring(zoneId) .."), subzoneName: " ..tostring(subzoneName))
+        d("[FCOMounty]Current zoneName(ID): " ..tostring(zoneName) .. "(".. tostring(zoneId) .."), subzoneName: " ..tostring(subzoneName))
         local zoneData = FCOMounty.ZoneData
         local addedZone = false
         if zoneData[zoneName] == nil then
