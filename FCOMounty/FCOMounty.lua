@@ -26,56 +26,8 @@ http://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
 
 if FCOM == nil then FCOM = {} end
 local FCOMounty = FCOM
-FCOMounty.isInDungeon = false
-FCOMounty.isInDelve = false
 
-FCOMounty.addonVars = {}
-FCOMounty.addonVars.addonVersion		        = "0.2.2"
-FCOMounty.addonVars.addonSavedVarsVersion	    = "0.01"
-FCOMounty.addonVars.addonName				    = "FCOMounty"
-FCOMounty.addonVars.addonNameMenu  		        = "FCO Mounty"
-FCOMounty.addonVars.addonNameMenuDisplay	    = "|c00FF00FCO |cFFFF00 Mounty|r"
-FCOMounty.addonVars.addonSavedVariablesName     = "FCOMounty_Settings"
-FCOMounty.addonVars.settingsName   		        = "FCO Mounty"
-FCOMounty.addonVars.addonAuthor			        = "Baertram"
-FCOMounty.addonVars.addonWebsite                = "http://www.esoui.com/downloads/info1866-FCOMounty.html"
-FCOMounty.addonVars.addonFeedback               = "https://www.esoui.com/downloads/info1866-FCOMounty.html#comments"
-FCOMounty.addonVars.addonDonation               = "https://www.esoui.com/portal.php?id=136&a=faq&faqid=131"
-FCOMounty.addonVars.bugReportURL                = "https://www.esoui.com/portal.php?id=136&a=bugreport&addonid=%s&title=%s&message=%s"
-FCOMounty.addonVars.bugReportAddonId            = 1866 -- FCOMounty
-
-FCOMounty.settingsVars = {}
-FCOMounty.settingsVars.defaultSettings = {}
-FCOMounty.settingsVars.settings = {}
-FCOMounty.settingsVars.defaults = {}
-
-FCOMounty.preventerVars = {}
-FCOMounty.preventerVars.doNotUpdateSubZoneValue = false
-FCOMounty.preventerVars.doNotUpdateRandomMountsValue = false
-FCOMounty.preventerVars.lastZone = FCOM_NONE_ENTRIES
-FCOMounty.preventerVars.lastSubZone = FCOM_NONE_ENTRIES
-FCOMounty.preventerVars.doNotChangePresetMount = false
-FCOMounty.preventerVars.getMountFromSettingsNow = false
-FCOMounty.preventerVars.updateMountInCombat = false
-FCOMounty.preventerVars.manuallyMountChosen = false
-
-FCOMounty.LAMDropdownSubZoneNames = {}
-FCOMounty.LAMDropdownSubZoneValues = {}
-FCOMounty.LAMSelectedZone       = FCOM_NONE_ENTRIES
-FCOMounty.LAMSelectedSubZone    = FCOM_NONE_ENTRIES
-
---For the shown mount's enhancements
-FCOMounty.gameSettings = {}
-FCOMounty.gameSettings.settingsCategories = {}
-FCOMounty.gameSettings.settingsCategories[RIDING_TRAIN_SPEED] = SETTING_TYPE_IN_WORLD
-FCOMounty.gameSettings.settingsCategories[RIDING_TRAIN_STAMINA] = SETTING_TYPE_IN_WORLD
-FCOMounty.gameSettings.settingsCategories[RIDING_TRAIN_CARRYING_CAPACITY] = SETTING_TYPE_IN_WORLD
-FCOMounty.gameSettings.settingsIDs = {}
-FCOMounty.gameSettings.settingsIDs[RIDING_TRAIN_SPEED] = IN_WORLD_UI_SETTING_HIDE_MOUNT_SPEED_UPGRADE
-FCOMounty.gameSettings.settingsIDs[RIDING_TRAIN_STAMINA] = IN_WORLD_UI_SETTING_HIDE_MOUNT_STAMINA_UPGRADE
-FCOMounty.gameSettings.settingsIDs[RIDING_TRAIN_CARRYING_CAPACITY] = IN_WORLD_UI_SETTING_HIDE_MOUNT_INVENTORY_UPGRADE
---Random mounts
-FCOMounty.lastRandomMountId = 0
+local EM = EVENT_MANAGER
 
 
 --Request the update to the mount change
@@ -83,16 +35,16 @@ local function RequestMountUpdate(forceMountActivation)
     forceMountActivation = forceMountActivation or false
     local callbackName = "FCOMounty_updateMountCollectible"
     local function Update(doForceMountActivation)
-        EVENT_MANAGER:UnregisterForUpdate(callbackName)
+        EM:UnregisterForUpdate(callbackName)
         --Update the mount collectible now
         --FCOMounty.ActivateMountForZone(zone, subZone, override, onlyUpdateMountVisibleEnhancements, updateMountEnh)
 --d("[FCOMounty]RequestMountUpdate -> Activate mount now, force: " ..tostring(doForceMountActivation))
         FCOMounty.ActivateMountForZone(nil, nil, doForceMountActivation, nil, true)
     end
     --cancel previously scheduled update if any
-    EVENT_MANAGER:UnregisterForUpdate(callbackName)
+    EM:UnregisterForUpdate(callbackName)
     --register a new one
-    EVENT_MANAGER:RegisterForUpdate(callbackName, 1000, function() Update(forceMountActivation) end)
+    EM:RegisterForUpdate(callbackName, 1000, function() Update(forceMountActivation) end)
 end
 
 -- EVENT_COLLECTIBLE_USE_RESULT(number eventCode, number CollectibleUsageBlockReason result, boolean isAttemptingActivation)
@@ -101,13 +53,14 @@ function FCOMounty.EventCollectibleUseResult(eventCode, CollectibleUsageBlockRea
     if not FCOMounty.preventerVars.doNotChangePresetMount and isAttemptingActivation then
         FCOMounty.preventerVars.manuallyMountChosen = true
         --Should the actively choosen mount be saved as the zone & subzone preset mount?
-        if FCOMounty.settingsVars.settings.autoPresetForZoneOnNewMount then
+        local settings = FCOMounty.settingsVars.settings
+        if settings.autoPresetForZoneOnNewMount and not settings.randomizeMountsForZoneAndSubzone then
             --Check a bit later as this event needs to finish first in order to update the active mount with the new chosen one from the collectibles!
             zo_callLater(function()
                 FCOMounty.preventerVars.getMountFromSettingsNow = false
                 FCOMounty.checkAndPresetMountForZone()
             end, 250)
-        else
+        elseif not settings.autoPresetForZoneOnNewMount then
             --d(">2")
             --Set the preventer variable so after a manual collectibel mount change the settings are read again to set
             --the selected zone & subzone mount later on again (e.g. on unmount or weapon pair change)
@@ -227,16 +180,16 @@ function FCOMounty.Player_Activated(...)
         RequestMountUpdate(true)
 
         --Register for the mount state changed event to check for the active zone and mount
-        EVENT_MANAGER:RegisterForEvent(FCOMounty.addonVars.addonName, EVENT_MOUNTED_STATE_CHANGED, FCOMounty.EventMountedStateChanged)
-        EVENT_MANAGER:RegisterForEvent(FCOMounty.addonVars.addonName, EVENT_COLLECTIBLE_USE_RESULT, FCOMounty.EventCollectibleUseResult)
+        EM:RegisterForEvent(FCOMounty.addonVars.addonName, EVENT_MOUNTED_STATE_CHANGED, FCOMounty.EventMountedStateChanged)
+        EM:RegisterForEvent(FCOMounty.addonVars.addonName, EVENT_COLLECTIBLE_USE_RESULT, FCOMounty.EventCollectibleUseResult)
 
-        --EVENT_MANAGER:RegisterForEvent(FCOMounty.addonVars.addonName, EVENT_ACTION_LAYER_POPPED, FCOMounty.EventActionLayerPopped)
-        --EVENT_MANAGER:RegisterForEvent(FCOMounty.addonVars.addonName, EVENT_ACTION_LAYER_PUSHED, FCOMounty.EventActionLayerPushed)
-        EVENT_MANAGER:RegisterForEvent(FCOMounty.addonVars.addonName, EVENT_ACTIVE_WEAPON_PAIR_CHANGED, FCOMounty.EventActiveWeaponPairChanged)
+        --EM:RegisterForEvent(FCOMounty.addonVars.addonName, EVENT_ACTION_LAYER_POPPED, FCOMounty.EventActionLayerPopped)
+        --EM:RegisterForEvent(FCOMounty.addonVars.addonName, EVENT_ACTION_LAYER_PUSHED, FCOMounty.EventActionLayerPushed)
+        EM:RegisterForEvent(FCOMounty.addonVars.addonName, EVENT_ACTIVE_WEAPON_PAIR_CHANGED, FCOMounty.EventActiveWeaponPairChanged)
 
-        EVENT_MANAGER:RegisterForEvent(FCOMounty.addonVars.addonName, EVENT_RIDING_SKILL_IMPROVEMENT, FCOMounty.EventRidingSkillImprovement)
+        EM:RegisterForEvent(FCOMounty.addonVars.addonName, EVENT_RIDING_SKILL_IMPROVEMENT, FCOMounty.EventRidingSkillImprovement)
 
-        EVENT_MANAGER:RegisterForEvent(FCOMounty.addonVars.addonName, EVENT_PLAYER_COMBAT_STATE, FCOMounty.EventPlayerCombatState)
+        EM:RegisterForEvent(FCOMounty.addonVars.addonName, EVENT_PLAYER_COMBAT_STATE, FCOMounty.EventPlayerCombatState)
     --else
         --d("[FCOMounty] Disabled addon inside delves & dungeons (for an improved performance)!")
     end
@@ -244,10 +197,10 @@ end
 
 function FCOMounty.addonLoaded(eventName, addon)
     if addon ~= FCOMounty.addonVars.addonName then return end
-    EVENT_MANAGER:UnregisterForEvent(eventName)
+    EM:UnregisterForEvent(eventName)
 
     --Register for the zone change/player ready event
-    EVENT_MANAGER:RegisterForEvent(FCOMounty.addonVars.addonName, EVENT_PLAYER_ACTIVATED, FCOMounty.Player_Activated)
+    EM:RegisterForEvent(FCOMounty.addonVars.addonName, EVENT_PLAYER_ACTIVATED, FCOMounty.Player_Activated)
 
     --Build the mount data
     FCOMounty.BuildMountData()
@@ -263,12 +216,13 @@ function FCOMounty.addonLoaded(eventName, addon)
     --Slash commands
     SLASH_COMMANDS["/fcomz"] = function() FCOMounty.zone2Chat() end
     SLASH_COMMANDS["/fcomr"] = function() FCOMounty.reportMissingZoneData() end
+    SLASH_COMMANDS["/fcoma"] = function() FCOMounty.EnhanceZoneDataByCurrentZone() end
 
     --Build the LAM
     FCOMounty.buildAddonMenu()
 end
 
 function FCOMounty.initialize()
-    EVENT_MANAGER:RegisterForEvent(FCOMounty.addonVars.addonName, EVENT_ADD_ON_LOADED, FCOMounty.addonLoaded)
+    EM:RegisterForEvent(FCOMounty.addonVars.addonName, EVENT_ADD_ON_LOADED, FCOMounty.addonLoaded)
 end
 FCOMounty.initialize()

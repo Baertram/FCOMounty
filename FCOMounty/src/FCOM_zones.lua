@@ -1,13 +1,81 @@
 if FCOM == nil then FCOM = {} end
 local FCOMounty = FCOM
 
+local function addZoneToSV(zoneName, subZoneName, addedNewZone, addedSubZoneToZone)
+    local zoneData = FCOMounty.ZoneData
+    FCOMounty.settingsVars.settings.ZoneDataManuallyAdded = FCOMounty.settingsVars.settings.ZoneDataManuallyAdded or {}
+    if addedNewZone then
+        FCOMounty.settingsVars.settings.ZoneDataManuallyAdded[zoneName] = {}
+    end
+    if addedSubZoneToZone and subZoneName ~= nil then
+        FCOMounty.settingsVars.settings.ZoneDataManuallyAdded[zoneName] = FCOMounty.settingsVars.settings.ZoneDataManuallyAdded[zoneName] or {}
+        FCOMounty.settingsVars.settings.ZoneDataManuallyAdded[zoneName][subZoneName] = zoneData[zoneName][subZoneName]
+    end
+
+    if addedSubZoneToZone and subZoneName ~= nil then
+        if addedNewZone then
+            d("[FCOMounty]Added the new zone \'".. zoneName .."\' and subZone \'".. subZoneName .."\' .\nPlease still use the slash command /fcomr to report this missing zone + subzone to the author so that others benefit from the data as well")
+        else
+            d("[FCOMounty]Added the subZone \'".. subZoneName .."\' to the existing zone \'".. zoneName .."\'.\nPlease still use the slash command /fcomr to report this missing zone + subzone to the author so that others benefit from the data as well")
+        end
+    elseif addedNewZone then
+        d("[FCOMounty]Added the new zone \'".. zoneName .."\' to the ZoneData.\nPlease still use the slash command /fcomr to report this missing zone + subzone to the author so that others benefit from the data as well")
+    end
+end
+
+--Try to add missing zone data to the table FCOMounty.ZoneData
+function FCOMounty.EnhanceZoneDataByCurrentZone(zoneIndex)
+--d("FCOMounty.EnhanceZoneDataByCurrentZone")
+    local isInDungeon, isInDelve = FCOMounty.isPlayerInDungeon()
+    if isInDungeon or isInDelve then return false end
+    local zoneId, parentZoneId
+    zoneIndex = zoneIndex or GetCurrentMapZoneIndex()
+    if not zoneIndex then return false end
+    zoneId = GetZoneId(zoneIndex)
+    if zoneId == nil or zoneId <= 0 then return false end
+    parentZoneId = GetParentZoneId(zoneId)
+    if parentZoneId == nil then return false end
+    --We are only able to check the currently active subzone data! Not all data at the map.
+    local zoneName, subzoneName, _, _ = FCOMounty.GetZoneAndSubzone()
+    if zoneName ~= nil and zoneName ~= "" then
+d("[FCOMounty]Current zoneName(ID): " ..tostring(zoneName) .. "(".. tostring(zoneId) .."), subzoneName: " ..tostring(subzoneName))
+        local zoneData = FCOMounty.ZoneData
+        local addedZone = false
+        if zoneData[zoneName] == nil then
+            addedZone = true
+            FCOMounty.ZoneData[zoneName] = {}
+        end
+        FCOMounty.ZoneData[zoneName][FCOM_ZONE_ID_STRING] = zoneId
+        if subzoneName ~= nil and subzoneName ~= "" then
+            if zoneData[zoneName][subzoneName] == nil then
+                if zoneId == parentZoneId or subzoneName == zoneName .. "_base" then
+                    FCOMounty.ZoneData[zoneName][subzoneName] = zoneId
+                elseif zoneId ~= parentZoneId then
+                    FCOMounty.ZoneData[zoneName][subzoneName] = zoneId
+                else
+                    FCOMounty.ZoneData[zoneName][subzoneName] = subzoneName
+                end
+                addZoneToSV(zoneName, subzoneName, addedZone, true)
+                return true, FCOMounty.ZoneData[zoneName][subzoneName]
+            end
+        else
+            if addedZone then
+                addZoneToSV(zoneName, nil, addedZone, false)
+                return true, FCOMounty.ZoneData[zoneName]
+            end
+        end
+    end
+    return false
+end
+local enhanceZoneDataByCurrentZone =  FCOMounty.EnhanceZoneDataByCurrentZone
+
 --Return the zonedata
 function FCOMounty.GetZoneData(zone, subzone)
     local zoneData = FCOMounty.ZoneData
     local zoneGiven     = zone ~= nil and type(zone) == "string" and zone ~= ""
     local subZoneGiven  = subzone ~= nil and subzone ~= "" and subzone ~= "zoneId" and subzone ~= FCOM_NONE_ENTRIES and subzone ~= FCOM_ALL_ENTRIES
     local subZoneNotOrALLGiven = subzone == nil or (subzone ~= nil and subzone == FCOM_ALL_ENTRIES)
---d("[FCOMounty.GetZoneData] zone: " .. tostring(zone) .. ", subZone: " ..tostring(subzone))
+    --d("[FCOMounty.GetZoneData] zone: " .. tostring(zone) .. ", subZone: " ..tostring(subzone))
     local debugOutput = false
     if zoneGiven and subZoneGiven then
         if zoneData[zone] and zoneData[zone][subzone] then
@@ -22,22 +90,31 @@ function FCOMounty.GetZoneData(zone, subzone)
             debugOutput = true
         end
     end
+
+    --Prevent endless loop
+    if FCOMounty.preventerVars.GetZoneDataCallActive == true then return nil end
+
     --Show debug output about zone/subZone missing?
-    local settings = FCOMounty.settingsVars.settings
-    if debugOutput and settings.debug == true then
-        local isInDungeon, isInDelve = FCOMounty.isPlayerInDungeon()
-        if not isInDungeon and not isInDelve then
-            local zoneIndex = GetCurrentMapZoneIndex()
-            local zoneId, parentZoneId
-            if zoneIndex ~= nil then
-                zoneId = GetZoneId(zoneIndex)
-                if zoneId ~= nil then parentZoneId = GetParentZoneId(zoneId) end
+    local isInDungeon, isInDelve = FCOMounty.isPlayerInDungeon()
+    if not isInDungeon and not isInDelve then
+        local zoneIndex = GetCurrentMapZoneIndex()
+        if zoneIndex ~= nil then
+            local zoneDataUpdated
+            local wasZoneDataUpdated, _ = enhanceZoneDataByCurrentZone(zoneIndex)
+            if wasZoneDataUpdated == true then
+                FCOMounty.preventerVars.GetZoneDataCallActive = true
+                zoneDataUpdated = FCOMounty.GetZoneData(zone, subzone)
+                FCOMounty.preventerVars.GetZoneDataCallActive = false
             end
-            d(">========================================>")
-            d("[FCOMounty] The current zone data is missing.")
-            d("Please use the chat command /fcomr ingame, AT THE SAME POSITION WHERE THIS ERROR MESSAGE IS SHOWN, to report the missing data as a bug.")
-            d("Watch the chat for feedback about the missing data.")
-            d("<========================================<")
+            local settings = FCOMounty.settingsVars.settings
+            if debugOutput and settings.debug == true then
+                d(">========================================>")
+                d("[FCOMounty] The current zone data is missing.")
+                d("Please use the chat command /fcomr ingame, AT THE SAME POSITION WHERE THIS ERROR MESSAGE IS SHOWN, to report the missing data as a bug.")
+                d("Watch the chat for feedback about the missing data.")
+                d("<========================================<")
+            end
+            return zoneDataUpdated, wasZoneDataUpdated
         end
     end
     --Return nil if nothing relevant was found
@@ -119,6 +196,7 @@ function FCOMounty.reportMissingZoneData()
         return
     end
     local zone, subZone, mapTileTextureNameLowerOrig, mapTileTextureNameLowerOrigUnchanged = FCOMounty.GetZoneAndSubzone()
+    local zoneDataKnown, wasZoneDataUpdated
     local isStillMissing = false
     --Check if the zone and subZone are missing yet
     if zone == nil or subZone == nil or mapTileTextureNameLowerOrig == nil or mapTileTextureNameLowerOrig == "" then
@@ -132,7 +210,7 @@ function FCOMounty.reportMissingZoneData()
             settingsDebugWasActive = true
             FCOMounty.settingsVars.settings = false
         end
-        local zoneDataKnown = FCOMounty.GetZoneData(zone, subZone)
+        zoneDataKnown, wasZoneDataUpdated = FCOMounty.GetZoneData(zone, subZone)
         --Reenable the debug settings if they were enabled before
         if settingsDebugWasActive == true then
             FCOMounty.settingsVars.settings = true
@@ -144,7 +222,11 @@ function FCOMounty.reportMissingZoneData()
     end
     --Not missing: Show the error message to the user
     if not isStillMissing then
-        d(string.format("|c00FF00The zone |r\'%s\'|c00FF00 and subzone |r\'%s\'|c00FF00 you wanted to report already exist!|r\nBefore reporting missing zone and subzones make sure to open the FCOMounty settings and press the button \'Current zone\'.\nIf the zone and subzone are already supported the button will change the dropdown boxes to the zone and subzone automatically.\n\n|cFFFFFFIf the dropdownbox values do not change the zone or subzone are still missing.|r\n|cFFFFFFOnly then you won't see this text here but a popup which will open a website.|r\n|cFFFFFFAt this website the missing information will be reported to the FCOMounty addon author as a bug report.|r\n|cFFFFFFSome data will be pre-entered (zoneid, zonename, subzonename, client language) and you simply need to send it via this website to the author.|r", tostring(zone), tostring(subZone)))
+        if wasZoneDataUpdated ~= nil and wasZoneDataUpdated == true then
+            d(string.format("|cFF0000The zone |r\'%s\'|cFF0000 and/or subzone |r\'%s\'|cFF0000 you are reporting are/is missing within FCOMounty data!|r\n\n|cFFFFFFA popup will open where you need to acknowledge the open of the FCOMounty bug create website. At this website the missing information will be reported to the FCOMounty addon author as a bug report.|r\n|cFFFFFFSome data will be pre-entered (zoneid, zonename, subzonename, client language) and you simply need to send it via this website to the author.\nThe data will be added locally to the table for now and will be used until next zone change/reloadui!|r", tostring(zone), tostring(subZone)))
+        else
+            d(string.format("|c00FF00The zone |r\'%s\'|c00FF00 and subzone |r\'%s\'|c00FF00 you wanted to report already exist!|r\nBefore reporting missing zone and subzones make sure to open the FCOMounty settings and press the button \'Current zone\'.\nIf the zone and subzone are already supported the button will change the dropdown boxes to the zone and subzone automatically.\n\n|cFFFFFFIf the dropdownbox values do not change the zone or subzone are still missing.|r\n|cFFFFFFOnly then you won't see this text here but a popup which will open a website.|r\n|cFFFFFFAt this website the missing information will be reported to the FCOMounty addon author as a bug report.|r\n|cFFFFFFSome data will be pre-entered (zoneid, zonename, subzonename, client language) and you simply need to send it via this website to the author.\nThe data will be added locally to the table for now and will be used until next zone change/reloadui!|r", tostring(zone), tostring(subZone)))
+        end
         return
     else
         d(string.format("|cFF0000The zone |r\'%s\'|cFF0000 and/or subzone |r\'%s\'|cFF0000 you are reporting are/is missing within FCOMounty data!|r\n\n|cFFFFFFA popup will open where you need to acknowledge the open of the FCOMounty bug create website. At this website the missing information will be reported to the FCOMounty addon author as a bug report.|r\n|cFFFFFFSome data will be pre-entered (zoneid, zonename, subzonename, client language) and you simply need to send it via this website to the author.|r", tostring(zone), tostring(subZone)))

@@ -1,8 +1,8 @@
 ## Title: |c00FF00FCO |cFFFF00Mounty|r
 ## Author: Baertram
-## Version: 0.2.2
-## AddOnVersion: 022
-## APIVersion: 100035 100036
+## Version: 0.2.3
+## AddOnVersion: 023
+## APIVersion: 100035 101031
 ## Description: Advance your mount. Each zone (subzone): Another mount
 ## SavedVariables: FCOMounty_Settings
 ## DependsOn: LibAddonMenu-2.0>=32 LibZone>=074

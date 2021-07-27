@@ -1,13 +1,16 @@
 if FCOM == nil then FCOM = {} end
 local FCOMounty = FCOM
 
+local addonVars = FCOMounty.addonVars
+local addonName = addonVars.addonName
+local CM = CALLBACK_MANAGER
+
 function FCOMounty.buildAddonMenu()
     local lang = FCOMounty.lang or GetCVar("language.2")
 
     local settings = FCOMounty.settingsVars.settings
     if not settings or not FCOMounty.LAM then return false end
     local defaults = FCOMounty.settingsVars.defaults
-    local addonVars = FCOMounty.addonVars
 
     local panelData = {
         type 				= 'panel',
@@ -313,7 +316,7 @@ function FCOMounty.buildAddonMenu()
         end
     end
 
-    FCOMounty.FCOSettingsPanel = FCOMounty.LAM:RegisterAddonPanel(FCOMounty.addonVars.addonName .. "_LAM", panelData)
+    FCOMounty.FCOSettingsPanel = FCOMounty.LAM:RegisterAddonPanel(addonName .. "_LAM", panelData)
     local gameSettingsShowMountEnhancement = {}
 
     --LAM 2.0 callback function if the panel was created
@@ -328,7 +331,7 @@ function FCOMounty.buildAddonMenu()
             ChangeRandomMountEntries(nil, nil)
         end
     end
-    CALLBACK_MANAGER:RegisterCallback("LAM-PanelControlsCreated", FCOMLAMPanelCreated)
+    CM:RegisterCallback("LAM-PanelControlsCreated", FCOMLAMPanelCreated)
 
     local optionsTable =
     {	-- BEGIN OF OPTIONS TABLE
@@ -407,6 +410,17 @@ function FCOMounty.buildAddonMenu()
             end,
             disabled = function() return settings.randomizeMountsForZoneAndSubzone end,
             default = defaults.autoPresetForZoneOnNewMount,
+            width="full",
+        },
+        {
+            type = "checkbox",
+            name = 'Change mount: Preset for ALL sub zones',
+            tooltip = 'If you change the mount manually by help of the collectibles e.g.: Preset this mount as the current zone\'s mount & for ALL subzones of the zone.\nDoes not work if randomized mounts are enabled!',
+            getFunc = function() return settings.autoPresetForSubZoneALLOnNewMount end,
+            setFunc = function(value) settings.autoPresetForSubZoneALLOnNewMount = value
+            end,
+            disabled = function() return settings.randomizeMountsForZoneAndSubzone or not settings.autoPresetForZoneOnNewMount end,
+            default = defaults.autoPresetForSubZoneALLOnNewMount,
             width="full",
         },
         {
@@ -767,5 +781,5 @@ function FCOMounty.buildAddonMenu()
 
     } -- optionsTable
     -- END OF OPTIONS TABLE
-    FCOMounty.LAM:RegisterOptionControls(FCOMounty.addonVars.addonName .. "_LAM", optionsTable)
+    FCOMounty.LAM:RegisterOptionControls(addonName .. "_LAM", optionsTable)
 end

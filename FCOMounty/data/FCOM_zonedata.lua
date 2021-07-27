@@ -564,4 +564,3 @@ FCOMounty.ZoneData["blackwood"] = {-- Blackwood
     ["u30_gideoncity_base"] = "Gideon",
     ["u30_leyawiincity_base"] = "Leyawiin"
 }
-

@@ -74,6 +74,10 @@ end
 --Read the SavedVariables
 function FCOMounty.getSettings()
     local addonVars = FCOMounty.addonVars
+    local svName    = addonVars.addonSavedVariablesName
+    local svVersion = addonVars.addonSavedVarsVersion
+    local svProfile = "Settings"
+
     --The default values for the language and save mode
     local defaultsSettings = {
         language 	 		    = 1, --Standard: English
@@ -92,8 +96,11 @@ function FCOMounty.getSettings()
         zone2Mount                  = {},
         zone2RandomMounts           = {},
         autoPresetForZoneOnNewMount = false,
+        autoPresetForSubZoneALLOnNewMount = false,
         useSubzoneALLMountInAllSubzones = false,
         randomizeMountsForZoneAndSubzone = false,
+
+        ZoneDataManuallyAdded = {}
     }
     FCOMounty.settingsVars.defaults = defaults
     --Build the default values for the addon settings
@@ -103,18 +110,29 @@ function FCOMounty.getSettings()
     --	LOAD USER SETTINGS
     --=============================================================================================================
     --Load the user's settings from SavedVariables file -> Account wide of basic version 999 at first
-    FCOMounty.settingsVars.defaultSettings = ZO_SavedVars:NewAccountWide(addonVars.addonSavedVariablesName, 999, "SettingsForAll", defaultsSettings)
+    FCOMounty.settingsVars.defaultSettings = ZO_SavedVars:NewAccountWide(svName, 999, "SettingsForAll", defaultsSettings)
 
     --Check, by help of basic version 999 settings, if the settings should be loaded for each character or account wide
     --Use the current addon version to read the settings now
     if (FCOMounty.settingsVars.defaultSettings.saveMode == 1) then
-        FCOMounty.settingsVars.settings = ZO_SavedVars:NewCharacterIdSettings(addonVars.addonSavedVariablesName, addonVars.addonSavedVarsVersion , "Settings", defaults)
-    elseif (FCOMounty.settingsVars.defaultSettings.saveMode == 2) then
-        FCOMounty.settingsVars.settings = ZO_SavedVars:NewAccountWide(addonVars.addonSavedVariablesName, addonVars.addonSavedVarsVersion, "Settings", defaults)
+        FCOMounty.settingsVars.settings = ZO_SavedVars:NewCharacterIdSettings(svName, svVersion , svProfile, defaults)
     else
-        FCOMounty.settingsVars.settings = ZO_SavedVars:NewAccountWide(addonVars.addonSavedVariablesName, addonVars.addonSavedVarsVersion, "Settings", defaults)
+        FCOMounty.settingsVars.settings = ZO_SavedVars:NewAccountWide(svName, svVersion, svProfile, defaults)
     end
     --=============================================================================================================
+
+    --Load zoneData from the settings and transfer them to the zoneData table
+    local zoneDataManuallyAdded = FCOMounty.settingsVars.settings.ZoneDataManuallyAdded
+    for zoneName, zoneDataOfZone in pairs(zoneDataManuallyAdded) do
+        if zoneName ~= "" then
+            FCOMounty.ZoneData[zoneName] = FCOMounty.ZoneData[zoneName] or {}
+            for subZoneName, subZoneIdOrStr in pairs(zoneDataOfZone) do
+                if subZoneName ~= "" then
+                    FCOMounty.ZoneData[zoneName][subZoneName] = subZoneIdOrStr
+                end
+            end
+        end
+    end
 end
 
 --Save the chosen mount number mountId from the LAM settings to the SavedVariables. The booelan parameter activateMount
@@ -129,8 +147,9 @@ function FCOMounty.SaveMountIdToSettings(mountId, activateMount, zone, subZone, 
     if zone ~= nil and zone ~= "" and (subZone ~= nil and subZone ~= "" and subZone ~= FCOM_NONE_ENTRIES and subZone ~= FCOM_ALL_ENTRIES) then
 --d(">zone & subZone saving, zone: " ..tostring(zone) .. ", subZone: " .. tostring(subZone) ..", mountId: " .. tostring(mountId) .. " (" .. ZO_CachedStrFormat("<<C:1>>", GetCollectibleInfo(mountId)) .. ")")
 
-        if settings.zone2Mount[zone] == nil then settings.zone2Mount[zone] = {} end
-        if settings.zone2Mount[zone][subZone] == nil then settings.zone2Mount[zone][subZone] = {} end
+        settings.zone2Mount = settings.zone2Mount or {}
+        settings.zone2Mount[zone] = settings.zone2Mount[zone] or {}
+        settings.zone2Mount[zone][subZone] = settings.zone2Mount[zone][subZone] or {}
         settings.zone2Mount[zone][subZone].mountId = mountId
         if mountId ~= 0 and mountEnhancements ~= nil then
             if settings.zone2Mount[zone][subZone].mountEnhancements == nil then settings.zone2Mount[zone][subZone].mountEnhancements = {} end
@@ -145,7 +164,8 @@ function FCOMounty.SaveMountIdToSettings(mountId, activateMount, zone, subZone, 
         if      (FCOMounty.subZone ~= nil and subZone == FCOM_ALL_ENTRIES)
             or  (FCOMounty.subZone == nil) then
 --d(">zone saving, zone: " ..tostring(zone) .. ", mountId: " .. tostring(mountId) .. " (" .. ZO_CachedStrFormat("<<C:1>>", GetCollectibleInfo(mountId)) .. ")")
-            if settings.zone2Mount[zone] == nil then settings.zone2Mount[zone] = {} end
+            settings.zone2Mount = settings.zone2Mount or {}
+            settings.zone2Mount[zone] = settings.zone2Mount[zone] or {}
             settings.zone2Mount[zone].mountId = mountId
             if mountId ~= 0 and mountEnhancements ~= nil then
                 if settings.zone2Mount[zone].mountEnhancements == nil then settings.zone2Mount[zone].mountEnhancements = {} end

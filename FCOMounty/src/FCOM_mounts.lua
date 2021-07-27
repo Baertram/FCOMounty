@@ -7,7 +7,7 @@ local FCOMounty = FCOM
 function FCOMounty.BuildMountData()
     FCOMounty.MountData = {}
     local MountData = {}
-d("[FCOMounty]BuildMountData")
+--d("[FCOMounty]BuildMountData")
     --[[
         for categoryIndex=1, GetNumCollectibleCategories() do
             local name, numSubCatgories, numCollectibles, unlockedCollectibles = GetCollectibleCategoryInfo(categoryIndex)
@@ -358,5 +358,11 @@ function FCOMounty.checkAndPresetMountForZone()
         end
         --Set the current active mount as new mount now
         FCOMounty.SaveMountIdToSettings(activeMountId, false, zone, subZone, mouseEnhancementData)
+
+        local settings = FCOMounty.settingsVars.settings
+        if settings.autoPresetForZoneOnNewMount and settings.autoPresetForSubZoneALLOnNewMount and not settings.randomizeMountsForZoneAndSubzone then
+            --Save the mount to the ALL subzone as well?
+            FCOMounty.SaveMountIdToSettings(activeMountId, false, zone, FCOM_ALL_ENTRIES, mouseEnhancementData)
+        end
     end
 end
