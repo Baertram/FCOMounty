@@ -5,6 +5,9 @@ local addonVars = FCOMounty.addonVars
 local addonName = addonVars.addonName
 local CM = CALLBACK_MANAGER
 
+local LAMSettingsFirstOpen = true
+local updateMountsAndZonesDropdowns
+
 function FCOMounty.buildAddonMenu()
     local lang = FCOMounty.lang or GetCVar("language.2")
 
@@ -32,7 +35,7 @@ function FCOMounty.buildAddonMenu()
     }
 
     --Build the LAM dropdown boxes for the mounts
-    local function BuildMountDopdown()
+    local function BuildMountDropdown()
         local mountValues = {}
         local mountNames = {}
         table.insert(mountNames, FCOM_NONE_ENTRIES)
@@ -50,10 +53,10 @@ function FCOMounty.buildAddonMenu()
         FCOMounty.DropdownMountNames  = mountNames
         FCOMounty.DropdownMountValues = mountValues
     end
-    BuildMountDopdown()
+    BuildMountDropdown()
 
     --Build the LAM dropdown boxes for the zones
-    local function BuildZoneDopdown()
+    local function BuildZoneDropdown()
         local zoneNameDropDownBoxes = {}
         local zoneValueDropDownBoxes = {}
         local subZoneNameDropdownBoxes = {}
@@ -117,7 +120,23 @@ function FCOMounty.buildAddonMenu()
         FCOMounty.DropdownSubZoneNames  = subZoneNameDropdownBoxes
         FCOMounty.DropdownSubZoneValues = subZoneValueDropdownBoxes
     end
-    BuildZoneDopdown()
+    BuildZoneDropdown()
+
+    --Create function to update the data as LAM re-opens
+    updateMountsAndZonesDropdowns = function()
+        d("[FCOMounty]updateMountsAndZonesDropdowns")
+        BuildMountDropdown()
+        if FCOMounty_LAM_Dropdown_Mounts_For_Mount ~= nil then
+            FCOMounty_LAM_Dropdown_Mounts_For_Mount:UpdateChoices(FCOMounty.DropdownMountNames, FCOMounty.DropdownMountValues)
+        end
+        BuildZoneDropdown()
+        if FCOMounty_LAM_Dropdown_Zones_For_Mount ~= nil then
+            FCOMounty_LAM_Dropdown_Zones_For_Mount:UpdateChoices(FCOMounty.DropdownZoneNames, FCOMounty.DropdownZoneValues)
+        end
+        if FCOMounty_LAM_Dropdown_SubZones_For_Mount ~= nil then
+            FCOMounty_LAM_Dropdown_SubZones_For_Mount:UpdateChoices(FCOMounty.DropdownSubZoneNames, FCOMounty.DropdownSubZoneValues)
+        end
+    end
 
     --Hide the mount selection dropdown
     local function SetMountSelectDropdownBoxState(state)
@@ -331,7 +350,19 @@ function FCOMounty.buildAddonMenu()
             ChangeRandomMountEntries(nil, nil)
         end
     end
+    local function FCOMLAMPanelOpened(panel)
+        if panel == FCOMounty.FCOSettingsPanel then
+            if LAMSettingsFirstOpen == true then
+                LAMSettingsFirstOpen = false
+                return
+            end
+            updateMountsAndZonesDropdowns()
+        end
+
+    end
+
     CM:RegisterCallback("LAM-PanelControlsCreated", FCOMLAMPanelCreated)
+    CM:RegisterCallback("LAM-PanelOpened", FCOMLAMPanelOpened)
 
     local optionsTable =
     {	-- BEGIN OF OPTIONS TABLE

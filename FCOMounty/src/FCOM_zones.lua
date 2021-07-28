@@ -99,7 +99,8 @@ function FCOMounty.GetZoneData(zone, subzone)
 
     --Show debug output about zone/subZone missing?
     local isInDungeon, isInDelve = FCOMounty.isPlayerInDungeon()
-    if not isInDungeon and not isInDelve then
+    local houseOwner = GetCurrentHouseOwner()
+    if not isInDungeon and not isInDelve and (not houseOwner or (houseOwner and houseOwner == "")) then
         local zoneIndex = GetCurrentMapZoneIndex()
         if zoneIndex ~= nil then
             local zoneDataUpdated
