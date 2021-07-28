@@ -53,7 +53,7 @@ function FCOMounty.EnhanceZoneDataByCurrentZone(zoneIndex)
         FCOMounty.ZoneData[zoneName][FCOM_ZONE_ID_STRING] = zoneId
         if subzoneName ~= nil and subzoneName ~= "" then
             if zoneData[zoneName][subzoneName] == nil then
-                FCOMounty.ZoneData[zoneName][subzoneName] = subzoneName .. "|" ..tostring(zoneId)
+                FCOMounty.ZoneData[zoneName][subzoneName] = subzoneName .. "||" ..tostring(zoneId)
                 addZoneToSV(zoneName, subzoneName, addedZone, true)
                 return true, FCOMounty.ZoneData[zoneName][subzoneName]
             end
