@@ -13,6 +13,7 @@ local function addZoneToSV(zoneName, subZoneName, addedNewZone, addedSubZoneToZo
         FCOMounty.settingsVars.settings.ZoneDataManuallyAdded[zoneName] = FCOMounty.settingsVars.settings.ZoneDataManuallyAdded[zoneName] or {}
         FCOMounty.settingsVars.settings.ZoneDataManuallyAdded[zoneName][subZoneName] = zoneData[zoneName][subZoneName]
     end
+    FCOMounty.preventerVars.ZoneDataWasUpdatedNowUpdateLAMDropdowns = true
 
     if addedSubZoneToZone and subZoneName ~= nil then
         if addedNewZone then
@@ -102,7 +103,6 @@ function FCOMounty.GetZoneData(zone, subzone)
             local zoneDataUpdated
             local wasZoneDataUpdated, _ = enhanceZoneDataByCurrentZone(zoneIndex)
             if wasZoneDataUpdated == true then
-                FCOMounty.preventerVars.ZoneDataWasUpdatedNowUpdateLAMDropdowns = true
                 FCOMounty.preventerVars.GetZoneDataCallActive = true
                 zoneDataUpdated = FCOMounty.GetZoneData(zone, subzone)
                 FCOMounty.preventerVars.GetZoneDataCallActive = false
