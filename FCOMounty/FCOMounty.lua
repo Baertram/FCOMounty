@@ -176,6 +176,9 @@ function FCOMounty.Player_Activated(...)
     --Check if we are inside a dungeon/raid dungeon and disable FCOMounty checks then
     local isInDungeon, isInDelve = FCOMounty.isPlayerInDungeon()
     if not isInDungeon and not isInDelve then
+        --Update current zone's mount data
+        FCOMounty.EnhanceZoneDataByCurrentZone()
+
         --Activate the mount for the current zone & subzone, force the activation on addon load/player activated
         RequestMountUpdate(true)
 

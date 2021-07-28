@@ -41,7 +41,7 @@ function FCOMounty.EnhanceZoneDataByCurrentZone(zoneIndex)
     --We are only able to check the currently active subzone data! Not all data at the map.
     local zoneName, subzoneName, _, _ = FCOMounty.GetZoneAndSubzone()
     if zoneName ~= nil and zoneName ~= "" then
-        d("[FCOMounty]Current zoneName(ID): " ..tostring(zoneName) .. "(".. tostring(zoneId) .."), subzoneName: " ..tostring(subzoneName))
+        --d("[FCOMounty]Current zoneName(ID): " ..tostring(zoneName) .. "(".. tostring(zoneId) .."), subzoneName: " ..tostring(subzoneName))
         local zoneData = FCOMounty.ZoneData
         local addedZone = false
         if zoneData[zoneName] == nil then
@@ -51,13 +51,7 @@ function FCOMounty.EnhanceZoneDataByCurrentZone(zoneIndex)
         FCOMounty.ZoneData[zoneName][FCOM_ZONE_ID_STRING] = zoneId
         if subzoneName ~= nil and subzoneName ~= "" then
             if zoneData[zoneName][subzoneName] == nil then
-                if zoneId == parentZoneId or subzoneName == zoneName .. "_base" then
-                    FCOMounty.ZoneData[zoneName][subzoneName] = zoneId
-                elseif zoneId ~= parentZoneId then
-                    FCOMounty.ZoneData[zoneName][subzoneName] = zoneId
-                else
-                    FCOMounty.ZoneData[zoneName][subzoneName] = subzoneName
-                end
+                FCOMounty.ZoneData[zoneName][subzoneName] = subzoneName .. "|" ..tostring(zoneId)
                 addZoneToSV(zoneName, subzoneName, addedZone, true)
                 return true, FCOMounty.ZoneData[zoneName][subzoneName]
             end
@@ -70,7 +64,7 @@ function FCOMounty.EnhanceZoneDataByCurrentZone(zoneIndex)
     end
     return false
 end
-local enhanceZoneDataByCurrentZone =  FCOMounty.EnhanceZoneDataByCurrentZone
+local enhanceZoneDataByCurrentZone = FCOMounty.EnhanceZoneDataByCurrentZone
 
 --Return the zonedata
 function FCOMounty.GetZoneData(zone, subzone)
@@ -106,6 +100,7 @@ function FCOMounty.GetZoneData(zone, subzone)
             local zoneDataUpdated
             local wasZoneDataUpdated, _ = enhanceZoneDataByCurrentZone(zoneIndex)
             if wasZoneDataUpdated == true then
+                FCOMounty.preventerVars.ZoneDataWasUpdatedNowUpdateLAMDropdowns = true
                 FCOMounty.preventerVars.GetZoneDataCallActive = true
                 zoneDataUpdated = FCOMounty.GetZoneData(zone, subzone)
                 FCOMounty.preventerVars.GetZoneDataCallActive = false

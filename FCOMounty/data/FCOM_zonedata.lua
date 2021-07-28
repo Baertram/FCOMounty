@@ -558,9 +558,11 @@ FCOMounty.ZoneData["reach"] = {-- Reach
     ["u28_blackreach_base"] = 1208, -- Blackreach (underground of The Reach)
 }
 
+--[[
 FCOMounty.ZoneData["blackwood"] = {-- Blackwood
     [FCOM_ZONE_ID_STRING] = 1261,
     ["blackwood_base"] = 1261,
     ["u30_gideoncity_base"] = "Gideon",
     ["u30_leyawiincity_base"] = "Leyawiin"
 }
+]]

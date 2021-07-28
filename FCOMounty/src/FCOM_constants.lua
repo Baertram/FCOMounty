@@ -42,6 +42,8 @@ FCOMounty.preventerVars.doNotChangePresetMount = false
 FCOMounty.preventerVars.getMountFromSettingsNow = false
 FCOMounty.preventerVars.updateMountInCombat = false
 FCOMounty.preventerVars.manuallyMountChosen = false
+FCOMounty.preventerVars.GetZoneDataCallActive =false
+FCOMounty.preventerVars.ZoneDataWasUpdatedNowUpdateLAMDropdowns = false
 
 --LAM settings menu dropdowns
 FCOMounty.LAMDropdownSubZoneNames = {}
