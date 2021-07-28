@@ -5,7 +5,9 @@ local function addZoneToSV(zoneName, subZoneName, addedNewZone, addedSubZoneToZo
     local zoneData = FCOMounty.ZoneData
     FCOMounty.settingsVars.settings.ZoneDataManuallyAdded = FCOMounty.settingsVars.settings.ZoneDataManuallyAdded or {}
     if addedNewZone then
-        FCOMounty.settingsVars.settings.ZoneDataManuallyAdded[zoneName] = zoneData[zoneName]
+        FCOMounty.settingsVars.settings.ZoneDataManuallyAdded[zoneName] = {
+            [FCOM_ZONE_ID_STRING] = zoneData[zoneName][FCOM_ZONE_ID_STRING]
+        }
     end
     if addedSubZoneToZone and subZoneName ~= nil then
         FCOMounty.settingsVars.settings.ZoneDataManuallyAdded[zoneName] = FCOMounty.settingsVars.settings.ZoneDataManuallyAdded[zoneName] or {}
