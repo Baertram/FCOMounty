@@ -3,15 +3,14 @@ local FCOMounty = FCOM
 
 local function addZoneToSV(zoneName, subZoneName, addedNewZone, addedSubZoneToZone)
     local zoneData = FCOMounty.ZoneData
-    FCOMounty.settingsVars.settings.ZoneDataManuallyAdded = FCOMounty.settingsVars.settings.ZoneDataManuallyAdded or {}
     if addedNewZone then
-        FCOMounty.settingsVars.settings.ZoneDataManuallyAdded[zoneName] = {
+        FCOMounty.settingsVars.manuallyAddedZones[zoneName] = {
             [FCOM_ZONE_ID_STRING] = zoneData[zoneName][FCOM_ZONE_ID_STRING]
         }
     end
     if addedSubZoneToZone and subZoneName ~= nil then
-        FCOMounty.settingsVars.settings.ZoneDataManuallyAdded[zoneName] = FCOMounty.settingsVars.settings.ZoneDataManuallyAdded[zoneName] or {}
-        FCOMounty.settingsVars.settings.ZoneDataManuallyAdded[zoneName][subZoneName] = zoneData[zoneName][subZoneName]
+        FCOMounty.settingsVars.manuallyAddedZones[zoneName] = FCOMounty.settingsVars.manuallyAddedZones[zoneName] or {}
+        FCOMounty.settingsVars.manuallyAddedZones[zoneName][subZoneName] = zoneData[zoneName][subZoneName]
     end
     FCOMounty.preventerVars.ZoneDataWasUpdatedNowUpdateLAMDropdowns = true
 
@@ -46,21 +45,21 @@ function FCOMounty.EnhanceZoneDataByCurrentZone(zoneIndex)
     if zoneName ~= nil and zoneName ~= "" then
         --d("[FCOMounty]Current zoneName(ID): " ..tostring(zoneName) .. "(".. tostring(zoneId) .."), subzoneName: " ..tostring(subzoneName))
         local zoneData = FCOMounty.ZoneData
-        local addedZone = false
+        local addedNewZone = false
         if zoneData[zoneName] == nil then
-            addedZone = true
+            addedNewZone = true
             FCOMounty.ZoneData[zoneName] = {}
         end
         FCOMounty.ZoneData[zoneName][FCOM_ZONE_ID_STRING] = zoneId
         if subzoneName ~= nil and subzoneName ~= "" then
             if zoneData[zoneName][subzoneName] == nil then
                 FCOMounty.ZoneData[zoneName][subzoneName] = subzoneName .. "||" ..tostring(zoneId)
-                addZoneToSV(zoneName, subzoneName, addedZone, true)
+                addZoneToSV(zoneName, subzoneName, addedNewZone, true)
                 return true, FCOMounty.ZoneData[zoneName][subzoneName]
             end
         else
-            if addedZone then
-                addZoneToSV(zoneName, nil, addedZone, false)
+            if addedNewZone == true then
+                addZoneToSV(zoneName, nil, addedNewZone, false)
                 return true, FCOMounty.ZoneData[zoneName]
             end
         end

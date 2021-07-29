@@ -4,7 +4,7 @@
 ## AddOnVersion: 023
 ## APIVersion: 100035 101031
 ## Description: Advance your mount. Each zone (subzone): Another mount
-## SavedVariables: FCOMounty_Settings
+## SavedVariables: FCOMounty_Settings FCOMounty_NewZoneData
 ## DependsOn: LibAddonMenu-2.0>=32 LibZone>=074
 
 ## Libraries

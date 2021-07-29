@@ -1,20 +1,22 @@
 if FCOM == nil then FCOM = {} end
 local FCOMounty = FCOM
 
-FCOMounty.addonVars = {}
-FCOMounty.addonVars.addonVersion		        = "0.2.3"
-FCOMounty.addonVars.addonSavedVarsVersion	    = "0.01"
-FCOMounty.addonVars.addonName				    = "FCOMounty"
-FCOMounty.addonVars.addonNameMenu  		        = "FCO Mounty"
-FCOMounty.addonVars.addonNameMenuDisplay	    = "|c00FF00FCO |cFFFF00 Mounty|r"
-FCOMounty.addonVars.addonSavedVariablesName     = "FCOMounty_Settings"
-FCOMounty.addonVars.settingsName   		        = "FCO Mounty"
-FCOMounty.addonVars.addonAuthor			        = "Baertram"
-FCOMounty.addonVars.addonWebsite                = "http://www.esoui.com/downloads/info1866-FCOMounty.html"
-FCOMounty.addonVars.addonFeedback               = "https://www.esoui.com/downloads/info1866-FCOMounty.html#comments"
-FCOMounty.addonVars.addonDonation               = "https://www.esoui.com/portal.php?id=136&a=faq&faqid=131"
-FCOMounty.addonVars.bugReportURL                = "https://www.esoui.com/portal.php?id=136&a=bugreport&addonid=%s&title=%s&message=%s"
-FCOMounty.addonVars.bugReportAddonId            = 1866 -- FCOMounty
+local addonVars = {}
+addonVars.addonVersion		                    = "0.2.3"
+addonVars.addonSavedVarsVersion	                = "0.01"
+addonVars.addonName				                = "FCOMounty"
+addonVars.addonNameMenu  		                = "FCO Mounty"
+addonVars.addonNameMenuDisplay	                = "|c00FF00FCO |cFFFF00 Mounty|r"
+addonVars.addonSavedVariablesName               = "FCOMounty_Settings"
+addonVars.addonSavedVariablesNameNewZoneData    = "FCOMounty_NewZoneData"
+addonVars.settingsName   		                = "FCO Mounty"
+addonVars.addonAuthor			                = "Baertram"
+addonVars.addonWebsite                          = "http://www.esoui.com/downloads/info1866-FCOMounty.html"
+addonVars.addonFeedback                         = "https://www.esoui.com/downloads/info1866-FCOMounty.html#comments"
+addonVars.addonDonation                         = "https://www.esoui.com/portal.php?id=136&a=faq&faqid=131"
+addonVars.bugReportURL                          = "https://www.esoui.com/portal.php?id=136&a=bugreport&addonid=%s&title=%s&message=%s"
+addonVars.bugReportAddonId                      = 1866 -- FCOMounty
+FCOMounty.addonVars = addonVars
 
 --For the events EVENT_ACTION_LAYER_PUSHED|_POPPED
 LAYER_MOUSE_UI_MODE = 7
@@ -31,6 +33,7 @@ FCOMounty.settingsVars = {}
 FCOMounty.settingsVars.defaultSettings = {}
 FCOMounty.settingsVars.settings = {}
 FCOMounty.settingsVars.defaults = {}
+FCOMounty.settingsVars.manuallyAddedZones = {}
 
 --Prevent something
 FCOMounty.preventerVars = {}

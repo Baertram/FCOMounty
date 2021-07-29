@@ -75,6 +75,7 @@ end
 function FCOMounty.getSettings()
     local addonVars = FCOMounty.addonVars
     local svName    = addonVars.addonSavedVariablesName
+    local svNameNewZoneData  = addonVars.addonSavedVariablesNameNewZoneData
     local svVersion = addonVars.addonSavedVarsVersion
     local svProfile = "Settings"
 
@@ -86,21 +87,19 @@ function FCOMounty.getSettings()
 
     --Pre-set the deafult values
     local defaults = {
-        debug = false,
-        alwaysUseClientLanguage		= true,
-        stableFeedSettings          = {
-            [RIDING_TRAIN_SPEED]                = false,
-            [RIDING_TRAIN_STAMINA]              = false,
-            [RIDING_TRAIN_CARRYING_CAPACITY]    = false,
+        debug                             = false,
+        alwaysUseClientLanguage           = true,
+        stableFeedSettings                = {
+            [RIDING_TRAIN_SPEED]             = false,
+            [RIDING_TRAIN_STAMINA]           = false,
+            [RIDING_TRAIN_CARRYING_CAPACITY] = false,
         },
-        zone2Mount                  = {},
-        zone2RandomMounts           = {},
-        autoPresetForZoneOnNewMount = false,
+        zone2Mount                        = {},
+        zone2RandomMounts                 = {},
+        autoPresetForZoneOnNewMount       = false,
         autoPresetForSubZoneALLOnNewMount = false,
-        useSubzoneALLMountInAllSubzones = false,
-        randomizeMountsForZoneAndSubzone = false,
-
-        ZoneDataManuallyAdded = {}
+        useSubzoneALLMountInAllSubzones   = false,
+        randomizeMountsForZoneAndSubzone  = false,
     }
     FCOMounty.settingsVars.defaults = defaults
     --Build the default values for the addon settings
@@ -119,16 +118,28 @@ function FCOMounty.getSettings()
     else
         FCOMounty.settingsVars.settings = ZO_SavedVars:NewAccountWide(svName, svVersion, svProfile, defaults)
     end
+
+    --Manually/Automatically added new zonedata
+    --savedVariableTable, version, namespace, defaults, profile, displayName
+    _G[svNameNewZoneData] = _G[svNameNewZoneData] or {}
+    FCOMounty.settingsVars.manuallyAddedZones = _G[svNameNewZoneData]
+
     --=============================================================================================================
 
     --Load zoneData from the settings and transfer them to the zoneData table
-    local zoneDataManuallyAdded = FCOMounty.settingsVars.settings.ZoneDataManuallyAdded
-    for zoneName, zoneDataOfZone in pairs(zoneDataManuallyAdded) do
-        if zoneName ~= "" then
-            FCOMounty.ZoneData[zoneName] = FCOMounty.ZoneData[zoneName] or {}
-            for subZoneName, subZoneIdOrStr in pairs(zoneDataOfZone) do
-                if subZoneName ~= "" then
-                    FCOMounty.ZoneData[zoneName][subZoneName] = subZoneIdOrStr
+    local manuallyAddedZones = FCOMounty.settingsVars.manuallyAddedZones
+    if manuallyAddedZones ~= nil then
+        for zoneName, zoneDataOfZone in pairs(manuallyAddedZones) do
+            if zoneName ~= "" then
+                if FCOMounty.ZoneData[zoneName] == nil then
+                    FCOMounty.ZoneData[zoneName] = {}
+                end
+                for subZoneName, subZoneIdOrStr in pairs(zoneDataOfZone) do
+                    if subZoneName ~= "" then
+                        if FCOMounty.ZoneData[zoneName][subZoneName] == nil then
+                            FCOMounty.ZoneData[zoneName][subZoneName] = subZoneIdOrStr
+                        end
+                    end
                 end
             end
         end
