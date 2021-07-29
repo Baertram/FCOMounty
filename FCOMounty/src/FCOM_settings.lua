@@ -126,18 +126,34 @@ function FCOMounty.getSettings()
 
     --=============================================================================================================
 
-    --Load zoneData from the settings and transfer them to the zoneData table
+    --Load zoneData from the global SV table FCOMounty_NewZoneData and transfer them to the zoneData table.
+    --If the zoneData table contains a same zone + subzone the data within teh SV table FCOMounty_NewZoneData will be
+    --removed!
     local manuallyAddedZones = FCOMounty.settingsVars.manuallyAddedZones
     if manuallyAddedZones ~= nil then
         for zoneName, zoneDataOfZone in pairs(manuallyAddedZones) do
             if zoneName ~= "" then
                 if FCOMounty.ZoneData[zoneName] == nil then
+                    --Add zone from SV "not yet in the preloaded data" table
                     FCOMounty.ZoneData[zoneName] = {}
                 end
                 for subZoneName, subZoneIdOrStr in pairs(zoneDataOfZone) do
                     if subZoneName ~= "" then
                         if FCOMounty.ZoneData[zoneName][subZoneName] == nil then
+                            --Add subZone of zone from SV "not yet in the preloaded data" table
                             FCOMounty.ZoneData[zoneName][subZoneName] = subZoneIdOrStr
+                        else
+                            --Remove subZone from SV "not yet in the preloaded data" table as it is in the preloaded
+                            --data table already
+                            FCOMounty.settingsVars.manuallyAddedZones[zoneName][subZoneName] = nil
+                            --Only 1 subzone left at the zone?
+                            if NonContiguousCount(manuallyAddedZones[zoneName] == 1) then
+                                --is the 1 subzone the _zoneId entry?
+                                if manuallyAddedZones[zoneName][FCOM_ZONE_ID_STRING] ~= nil then
+                                    --Delete the zone from the "not yet in the preloaded data" table now
+                                    FCOMounty.settingsVars.manuallyAddedZones[zoneName] = nil
+                                end
+                            end
                         end
                     end
                 end
