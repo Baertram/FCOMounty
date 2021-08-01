@@ -147,7 +147,7 @@ function FCOMounty.getSettings()
                             --data table already
                             FCOMounty.settingsVars.manuallyAddedZones[zoneName][subZoneName] = nil
                             --Only 1 subzone left at the zone?
-                            if NonContiguousCount(manuallyAddedZones[zoneName] == 1) then
+                            if manuallyAddedZones[zoneName] and NonContiguousCount(manuallyAddedZones[zoneName] == 1) then
                                 --is the 1 subzone the _zoneId entry?
                                 if manuallyAddedZones[zoneName][FCOM_ZONE_ID_STRING] ~= nil then
                                     --Delete the zone from the "not yet in the preloaded data" table now

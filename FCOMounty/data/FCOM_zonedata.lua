@@ -401,7 +401,6 @@ FCOMounty.ZoneData["vvardenfell"] = { -- Vvardenfell
     ["forgottenwastes_base"] = 919,
 }
 
---[[
 FCOMounty.ZoneData["clockwork"] = {-- Clockwork City
     [FCOM_ZONE_ID_STRING] = 980,
     [FCOM_ZONE_MAPPING_STRING] = "Clockwork City",
@@ -410,7 +409,6 @@ FCOMounty.ZoneData["clockwork"] = {-- Clockwork City
     ["hallsofregulation_base"] = 985,
     ["shadowcleft_base"] = 986,
 }
-]]
 
 FCOMounty.ZoneData["summerset"] = {-- Summerset
     [FCOM_ZONE_ID_STRING] = 1011,
