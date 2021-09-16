@@ -2,7 +2,7 @@ if FCOM == nil then FCOM = {} end
 local FCOMounty = FCOM
 
 local addonVars = {}
-addonVars.addonVersion		                    = "0.2.4"
+addonVars.addonVersion		                    = "0.2.6"
 addonVars.addonSavedVarsVersion	                = "0.01"
 addonVars.addonName				                = "FCOMounty"
 addonVars.addonNameMenu  		                = "FCO Mounty"

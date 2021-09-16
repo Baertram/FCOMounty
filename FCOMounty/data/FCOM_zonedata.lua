@@ -107,6 +107,8 @@ FCOMounty.ZoneData["craglorn"] = { --Craglorn
     ["zalgazsden_base"] = 904,
     --Check (South-East)
     ["elinhir_base"] = 910,
+
+    ["craglorn_dragonstar_base"] = "Dragonstar", --Dragonstar
 }
 
 FCOMounty.ZoneData["cyrodiil"] = { --Cyrodiil
@@ -146,6 +148,10 @@ FCOMounty.ZoneData["cyrodiil"] = { --Cyrodiil
     ["imperialsewer_ebonheart3"] = "IC sewers: Ebonheart Pact 3",
     ["imperialsewers_aldmeri3"] = "IC sewers: Aldmeri Dominion 3",
     ["imperialsewer_daggerfall3"] = "IC sewers: Daggerfall Covenant 3",
+
+    ["southhighrockgate_base"] = "Southern High Rock Gate", --Southern High Rock Gate
+    ["imperialsewer_daggerfall1_base"] = 643, --Lambent Passage
+    ["northhighrockgate_base"] = "Northern High Rock Gate", --Northern High Rock Gate
 }
 
 FCOMounty.ZoneData["deshaan"] = { --"Deshaan"
@@ -218,6 +224,7 @@ FCOMounty.ZoneData["grahtwood"] = { --Grahtwood
     ["mobarmine_base"] = 447,
     ["rootsunder_base"] = 124,
     ["redfurtradingpost_base"] = "Redfur Trading Post",
+    ["eldenrootservices_base"] = 383,
 }
 
 FCOMounty.ZoneData["greenshade"] = { --Greenshade
@@ -282,6 +289,9 @@ FCOMounty.ZoneData["rivenspire"] = { --Rivenspire
     ["tribulationcrypt_base"] = 323,
     ["obsidianscar_base"] = 162,
     ["hoarfrostdowns_base"] = "Hoarfrost Downs",
+
+    ["hoarfrost_base"] = "Hoarfrost Downs", --Hoarfrost Downs
+    ["shroudedpass_base"] = "Shrouded Pass", --Shrouded Pass
 }
 
 FCOMounty.ZoneData["shadowfen"] = { --Shadowfen
@@ -363,6 +373,8 @@ FCOMounty.ZoneData["wrothgar"] = { --Wrothgar
     ["watchershold_base"] = 692,
     ["orsinium_base"] = true,
     ["morkulstronghold_base"] = 698,
+
+    ["arenaslobbyexterior_base"] = "Lobby of Maelstrom Arena",
 }
 
 FCOMounty.ZoneData["thievesguild"] = { --Hew's Bane
@@ -538,6 +550,7 @@ FCOMounty.ZoneData["southernelsweyr"] = {-- Southern Elsweyr
     --Southern Elsweyr
     ["southernelsweyr_base"]       = 1133, -- Southern Elsweyr
 	["senchal_base"] = "Senchal",
+    ["els_dg_sanctuary_base"] = 1146, --Dragonguard Sanctum
 }
 
 FCOMounty.ZoneData["skyrim"] = {-- Skyrim
