@@ -2,10 +2,11 @@ if FCOM == nil then FCOM = {} end
 local FCOMounty = FCOM
 
 FCOMounty.ZoneData = {}
+local zoneData = FCOMounty.ZoneData
 
 --The zones and subzones of the game, as strings (for library libMapPin access)
 --> Taken zone names from addon Skyshards by Ayantir & Garkin: http://www.esoui.com/downloads/info128-SkyShards.html
-FCOMounty.ZoneData["alikr"] = { --Alik'r Desert
+zoneData["alikr"] = { --Alik'r Desert
     [FCOM_ZONE_ID_STRING] = 104,
     --Alik'r Desert
     ["alikr_base"] = 104, --Alik'r Desert
@@ -21,13 +22,13 @@ FCOMounty.ZoneData["alikr"] = { --Alik'r Desert
     ["lostcity_base"] = 308,
 }
 
-FCOMounty.ZoneData["eyevea"] = { --Eyevea
+zoneData["eyevea"] = { --Eyevea
     [FCOM_ZONE_ID_STRING] = 267,
     --Eyevea
     ["eyevea_base"] = 267, --"Augvea"
 }
 
-FCOMounty.ZoneData["auridon"] = { --Auridon
+zoneData["auridon"] = { --Auridon
     [FCOM_ZONE_ID_STRING] = 381,
     --Auridon
     ["auridon_base"] = 381, -- Auridon
@@ -45,7 +46,7 @@ FCOMounty.ZoneData["auridon"] = { --Auridon
     ["firsthold_base"] = true,
 }
 
-FCOMounty.ZoneData["bangkorai"] = { --Bangkorai
+zoneData["bangkorai"] = { --Bangkorai
     [FCOM_ZONE_ID_STRING] = 92,
     --Bangkorai
     ["bangkorai_base"] = 92, --Bangkorai
@@ -63,7 +64,7 @@ FCOMounty.ZoneData["bangkorai"] = { --Bangkorai
     ["hallinsstand_base"] = "Hallins Stand",
 }
 
-FCOMounty.ZoneData["coldharbor"] = { --Coldharbour
+zoneData["coldharbor"] = { --Coldharbour
     [FCOM_ZONE_ID_STRING] = 347,
     --Coldharbour
     ["coldharbour_base"] = 347, -- Coldharbour
@@ -78,7 +79,7 @@ FCOMounty.ZoneData["coldharbor"] = { --Coldharbour
     ["hollowcity_base"] = "Hollow City",
 }
 
-FCOMounty.ZoneData["craglorn"] = { --Craglorn
+zoneData["craglorn"] = { --Craglorn
     [FCOM_ZONE_ID_STRING] = 888,
     --Craglorn
     ["craglorn_base"] = 888, --Craglorn
@@ -111,7 +112,7 @@ FCOMounty.ZoneData["craglorn"] = { --Craglorn
     ["craglorn_dragonstar_base"] = "Dragonstar", --Dragonstar
 }
 
-FCOMounty.ZoneData["cyrodiil"] = { --Cyrodiil
+zoneData["cyrodiil"] = { --Cyrodiil
     [FCOM_ZONE_ID_STRING] = 181,
     --Cyrodiil
     ["ava_whole"] = 181, --"Cyrodiil",
@@ -154,7 +155,7 @@ FCOMounty.ZoneData["cyrodiil"] = { --Cyrodiil
     ["northhighrockgate_base"] = "Northern High Rock Gate", --Northern High Rock Gate
 }
 
-FCOMounty.ZoneData["deshaan"] = { --"Deshaan"
+zoneData["deshaan"] = { --"Deshaan"
     [FCOM_ZONE_ID_STRING] = 57,
     --Deshaan
     ["deshaan_base"] = 57, -- Deshaan
@@ -173,7 +174,7 @@ FCOMounty.ZoneData["deshaan"] = { --"Deshaan"
     ["knifeeargrotto_base"] = 409,
 }
 
-FCOMounty.ZoneData["eastmarch"] = { --Eastmarch
+zoneData["eastmarch"] = { --Eastmarch
     [FCOM_ZONE_ID_STRING] = 101,
     --Eastmarch
     ["eastmarch_base"] = 101, --Eastmarch
@@ -188,7 +189,7 @@ FCOMounty.ZoneData["eastmarch"] = { --Eastmarch
     ["windhelm_base"] = true,
 }
 
-FCOMounty.ZoneData["glenumbra"] = { --Glenumbra
+zoneData["glenumbra"] = { --Glenumbra
     [FCOM_ZONE_ID_STRING] = 3,
     --Glenumbra
     ["glenumbra_base"] = 3, -- Glenumbra
@@ -210,7 +211,7 @@ FCOMounty.ZoneData["glenumbra"] = { --Glenumbra
     ["porthunding_base"] = "Port Hunding",
 }
 
-FCOMounty.ZoneData["grahtwood"] = { --Grahtwood
+zoneData["grahtwood"] = { --Grahtwood
     [FCOM_ZONE_ID_STRING] = 383,
     --Grahtwood
     ["grahtwood_base"] = 383, -- Grahtwodd
@@ -227,7 +228,7 @@ FCOMounty.ZoneData["grahtwood"] = { --Grahtwood
     ["eldenrootservices_base"] = 383,
 }
 
-FCOMounty.ZoneData["greenshade"] = { --Greenshade
+zoneData["greenshade"] = { --Greenshade
     [FCOM_ZONE_ID_STRING] = 108,
     --Greenshade
     ["greenshade_base"] = 108, -- Greenshade
@@ -242,7 +243,7 @@ FCOMounty.ZoneData["greenshade"] = { --Greenshade
     ["rulanyilsfall_base"] = 137,
 }
 
-FCOMounty.ZoneData["malabaltor"] = { --Malabal Tor
+zoneData["malabaltor"] = { --Malabal Tor
     [FCOM_ZONE_ID_STRING] = 58,
     --Malabal Tor
     [FCOM_ZONE_MAPPING_STRING] = "Malabal Tor",
@@ -259,7 +260,7 @@ FCOMounty.ZoneData["malabaltor"] = { --Malabal Tor
     ["crimsoncove02_base"] = 138,
 }
 
-FCOMounty.ZoneData["reapersmarch"] = { --Reaper's March
+zoneData["reapersmarch"] = { --Reaper's March
     [FCOM_ZONE_ID_STRING] = 382,
     --Reaper's March
     [FCOM_ZONE_MAPPING_STRING] = "Reapers March",
@@ -276,7 +277,7 @@ FCOMounty.ZoneData["reapersmarch"] = { --Reaper's March
     ["arenthia_base"] = true,
 }
 
-FCOMounty.ZoneData["rivenspire"] = { --Rivenspire
+zoneData["rivenspire"] = { --Rivenspire
     [FCOM_ZONE_ID_STRING] = 20,
     ["rivenspire_base"] = 20, --Rivenspire
     ["shornhelm_base"] = true,
@@ -294,7 +295,7 @@ FCOMounty.ZoneData["rivenspire"] = { --Rivenspire
     ["shroudedpass_base"] = "Shrouded Pass", --Shrouded Pass
 }
 
-FCOMounty.ZoneData["shadowfen"] = { --Shadowfen
+zoneData["shadowfen"] = { --Shadowfen
     [FCOM_ZONE_ID_STRING] = 117,
     ["shadowfen_base"] = 117, --Shadowfen
     ["stormhold_base"] = true,
@@ -308,7 +309,7 @@ FCOMounty.ZoneData["shadowfen"] = { --Shadowfen
     ["sanguinesdemesne_base"] = 134,
 }
 
-FCOMounty.ZoneData["stonefalls"] = { --Stonefalls
+zoneData["stonefalls"] = { --Stonefalls
     [FCOM_ZONE_ID_STRING] = 41,
     ["stonefalls_base"] = 41, --Stonefalls
     ["davonswatch_base"] = "Davons Watch",
@@ -328,7 +329,7 @@ FCOMounty.ZoneData["stonefalls"] = { --Stonefalls
     ["bleakrockvillage_base"] = "Bleackrock Village",
 }
 
-FCOMounty.ZoneData["stormhaven"] = { --Stormhaven
+zoneData["stormhaven"] = { --Stormhaven
     [FCOM_ZONE_ID_STRING] = 19,
     ["stormhaven_base"] = 19, --Stormhaven
     ["portdunwatch_base"] = 315,
@@ -343,7 +344,7 @@ FCOMounty.ZoneData["stormhaven"] = { --Stormhaven
     ["alcairecastle_base"] = 545,
 }
 
-FCOMounty.ZoneData["therift"] = { --The Rift
+zoneData["therift"] = { --The Rift
     [FCOM_ZONE_ID_STRING] = 103,
     [FCOM_ZONE_MAPPING_STRING] = "The Rift",
     ["therift_base"] = 103, --The Rift
@@ -359,7 +360,7 @@ FCOMounty.ZoneData["therift"] = { --The Rift
     ["nimalten_base"] = 412,
 }
 
-FCOMounty.ZoneData["wrothgar"] = { --Wrothgar
+zoneData["wrothgar"] = { --Wrothgar
     [FCOM_ZONE_ID_STRING] = 684,
     ["wrothgar_base"] = 684, --Wrothgar
     ["morkul_base"] = true,
@@ -377,7 +378,7 @@ FCOMounty.ZoneData["wrothgar"] = { --Wrothgar
     ["arenaslobbyexterior_base"] = "Lobby of Maelstrom Arena",
 }
 
-FCOMounty.ZoneData["thievesguild"] = { --Hew's Bane
+zoneData["thievesguild"] = { --Hew's Bane
     [FCOM_ZONE_ID_STRING] = 816,
     [FCOM_ZONE_MAPPING_STRING] = "Hews Bane",
     ["hewsbane_base"] = 816, --Hew's Bane
@@ -386,7 +387,7 @@ FCOMounty.ZoneData["thievesguild"] = { --Hew's Bane
     ["sharktoothgrotto1_base"] = 676,
 }
 
-FCOMounty.ZoneData["darkbrotherhood"] = { -- Gold Coast
+zoneData["darkbrotherhood"] = { -- Gold Coast
     [FCOM_ZONE_ID_STRING] = 823,
     [FCOM_ZONE_MAPPING_STRING] = "Gold Coast",
     ["goldcoast_base"] = 823, -- "Gold Coast",
@@ -396,7 +397,7 @@ FCOMounty.ZoneData["darkbrotherhood"] = { -- Gold Coast
     ["kvatchcity_base"] = 832,
 }
 
-FCOMounty.ZoneData["vvardenfell"] = { -- Vvardenfell
+zoneData["vvardenfell"] = { -- Vvardenfell
     [FCOM_ZONE_ID_STRING] = 849,
     ["vvardenfell_base"] = 849, --Vvardenfell
     ["cavernsofkogoruhnfw03_base"] = "Caverns Of Kogoruhn",
@@ -411,9 +412,10 @@ FCOMounty.ZoneData["vvardenfell"] = { -- Vvardenfell
     ["balmora_base"] = true,
     ["sadrithmora_base"] = true,
     ["forgottenwastes_base"] = 919,
+    ["vivecsdelyn03b_base"] = "Vivecs Delyn 03b",
 }
 
-FCOMounty.ZoneData["clockwork"] = {-- Clockwork City
+zoneData["clockwork"] = {-- Clockwork City
     [FCOM_ZONE_ID_STRING] = 980,
     [FCOM_ZONE_MAPPING_STRING] = "Clockwork City",
     ["clockwork_base"] = 980, -- Clockwork City
@@ -422,7 +424,7 @@ FCOMounty.ZoneData["clockwork"] = {-- Clockwork City
     ["shadowcleft_base"] = 986,
 }
 
-FCOMounty.ZoneData["summerset"] = {-- Summerset
+zoneData["summerset"] = {-- Summerset
     [FCOM_ZONE_ID_STRING] = 1011,
     --Summerset
     ["alinor_base"] = true,
@@ -438,13 +440,15 @@ FCOMounty.ZoneData["summerset"] = {-- Summerset
     ["torhamekhard_base"] = 1014,
     ["traitorsvault03_base"] = 1016,
     ["wastencoraldale_base"] = 1019,
+    ["collegeofpsijicsruins_base"] = "College of Psijics Ruins (indoor)", --College of Psijics Ruins (indoors area...)
 }
 
-FCOMounty.ZoneData["murkmire"] = {-- Murkmire
+zoneData["murkmire"] = {-- Murkmire
     [FCOM_ZONE_ID_STRING] = 726,
     --Murkmire
     ["murkmire_base"]       = 726, -- Murkmire
     ["lilmothcity_base"]    = "Lilmoth",
+    ["deadwatervillage_base"] = "Deadwater Village",
     --[[
         [1064] = "Hunter's Glade",
         [1065] = "Blight Bog Sump",
@@ -468,7 +472,7 @@ FCOMounty.ZoneData["murkmire"] = {-- Murkmire
     ]]
 }
 
-FCOMounty.ZoneData["elsweyr"] = {-- Elsweyr
+zoneData["elsweyr"] = {-- Elsweyr
     [FCOM_ZONE_ID_STRING] = 1086,
     --Northern Elsweyr
     ["elsweyr_base"]       = 1086, -- Northern Elsweyr
@@ -545,15 +549,16 @@ FCOMounty.ZoneData["elsweyr"] = {-- Elsweyr
     ["weepingscarpit_base"] = 1112,
 }
 
-FCOMounty.ZoneData["southernelsweyr"] = {-- Southern Elsweyr
+zoneData["southernelsweyr"] = {-- Southern Elsweyr
     [FCOM_ZONE_ID_STRING] = 1133,
     --Southern Elsweyr
     ["southernelsweyr_base"]       = 1133, -- Southern Elsweyr
 	["senchal_base"] = "Senchal",
     ["els_dg_sanctuary_base"] = 1146, --Dragonguard Sanctum
+    ["senchalpalace01_base"] = "Senchal Palace",
 }
 
-FCOMounty.ZoneData["skyrim"] = {-- Skyrim
+zoneData["skyrim"] = {-- Skyrim
     [FCOM_ZONE_ID_STRING] = 1160,
     --Western Skyrim
     ["westernskryim_base"]  = 1160,
@@ -562,7 +567,7 @@ FCOMounty.ZoneData["skyrim"] = {-- Skyrim
     ["blackreach_base"]     = 1161, -- Blackreach (underground of Western Skyrim)
 }
 
-FCOMounty.ZoneData["reach"] = {-- Reach
+zoneData["reach"] = {-- Reach
     [FCOM_ZONE_ID_STRING] = 1207,
     --The Reach
     ["reach_base"] = 1207,
@@ -571,9 +576,16 @@ FCOMounty.ZoneData["reach"] = {-- Reach
     ["u28_blackreach_base"] = 1208, -- Blackreach (underground of The Reach)
 }
 
-FCOMounty.ZoneData["blackwood"] = {-- Blackwood
+zoneData["blackwood"] = {-- Blackwood
     [FCOM_ZONE_ID_STRING] = 1261,
     ["blackwood_base"] = 1261,
     ["u30_gideoncity_base"] = "Gideon",
-    ["u30_leyawiincity_base"] = "Leyawiin"
+    ["u30_leyawiincity_base"] = "Leyawiin",
+    ["stonewastesfortress_base"] = "Stonewastes Fortress",
+}
+
+zoneData["deadlands"] = {--Deadlands
+    [FCOM_ZONE_ID_STRING] = 1282,
+    ["u32deadlandszone_base"] = 1286, --Deadlands
+    ["u32_fargrave_base"] = 1282, --Fargrave
 }

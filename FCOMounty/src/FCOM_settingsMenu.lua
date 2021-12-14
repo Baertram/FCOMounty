@@ -308,6 +308,8 @@ function FCOMounty.buildAddonMenu()
     --Get the currently selected mount visible enhancement settings form the LAM settings panel of current zone and subzone
     local function getLAMMountVisibleEnhancementSettings(zone, subZone)
         local mountVisibleEnhancementData = {}
+        if settings.zone2Mount[zone] == nil then return end
+        if settings.zone2Mount[zone][subZone] == nil then return end
         mountVisibleEnhancementData[RIDING_TRAIN_SPEED] = settings.zone2Mount[zone][subZone].mountEnhancements[RIDING_TRAIN_SPEED]
         mountVisibleEnhancementData[RIDING_TRAIN_STAMINA] = settings.zone2Mount[zone][subZone].mountEnhancements[RIDING_TRAIN_STAMINA]
         mountVisibleEnhancementData[RIDING_TRAIN_CARRYING_CAPACITY] = settings.zone2Mount[zone][subZone].mountEnhancements[RIDING_TRAIN_CARRYING_CAPACITY]

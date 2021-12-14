@@ -1,11 +1,11 @@
 ## Title: |c00FF00FCO |cFFFF00Mounty|r
 ## Author: Baertram
-## Version: 0.2.6
+## Version: 0.2.7
 ## AddOnVersion: 026
-## APIVersion: 101031
+## APIVersion: 101032 101033
 ## Description: Advance your mount. Each zone (subzone): Another mount
 ## SavedVariables: FCOMounty_Settings FCOMounty_NewZoneData
-## DependsOn: LibAddonMenu-2.0>=32 LibZone>=074
+## DependsOn: LibAddonMenu-2.0>=32 LibZone>=076
 
 ## Libraries
 ## Libraries won't be included anymore. They need to be installed as standalone versions. Please read the addon description for further details.
@@ -13,7 +13,7 @@
 ## Translations
 
 ## Constant values
-src/FCOM_constants.lua
+FCOM_constants.lua
 
 ## Include zone and subzone data
 data/FCOM_zonedata.lua
